@@ -36,9 +36,10 @@ runs:
       id: info
       env:
         UNITY_PROJECT_PATH: ${{ inputs.unity-project-path }}
-      run: dotnet run -c Release src/FetchUnityProjectInfo.cs
+      run: dotnet run -c Release src/share/FetchUnityProjectInfo.cs
     - name: Restore unity project cache
       if: contains(runner.labels, 'self-hosted')
+      id: unity-cache
       uses: actions/cache@v4
       with:
         path: ${{ inputs.unity-project-path }}/Library
@@ -46,3 +47,8 @@ runs:
         upload-chunk-size: ${{ inputs.upload-chunk-size }}
         fail-on-cache-miss: ${{ inputs.fail-on-cache-miss }}
         lookup-only: ${{ inputs.lookup-only }}
+    - name: Set outputs
+      env:
+        UNITY_CACHE_HIT: ${{ steps.unity-cache.outputs.cache-hit }}
+        NUGET_CACHE_HIT: false
+      run: dotnet run -c Release src/cache/SetOutPuts.cs
