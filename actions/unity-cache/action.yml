@@ -1,0 +1,48 @@
+name: 'Unity Cache'
+description: 'Unity Project Cache Control Wrapper.'
+author: 'AndanteTribe'
+inputs:
+  unity-project-path:
+    description: 'A directory paths for the Unity project to be cached and restored.'
+    required: true
+  upload-chunk-size:
+    description: 'The chunk size used to split up large files during upload, in bytes. Self-hosted runners are ignored.'
+    required: false
+  fail-on-cache-miss:
+    description: 'Fail the workflow if cache entry is not found.'
+    default: 'false'
+    required: false
+  lookup-only:
+    description: 'Check if a cache entry exists for the given input(s) (key, restore-keys) without downloading the cache.'
+    default: 'false'
+    required: false
+  use-nugetforunity:
+    description: 'Supports cache resolution and cache management via NuGetForUnity.Cli in Unity projects using NuGetForUnity.'
+    default: 'false'
+    required: false
+outputs:
+  cache-hit-unity:
+    description: 'A boolean value indicating that the cache for the target Unity project has been found.'
+  cache-hit-nuget:
+    description: 'A boolean value indicating that the NuGet cache for the target Unity project has been found.'
+runs:
+  using: "composite"
+  steps:
+    - name: Setup dotnet
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: "10.0.x"
+    - name: Fetch unity project info
+      id: info
+      env:
+        UNITY_PROJECT_PATH: ${{ inputs.unity-project-path }}
+      run: dotnet run -c Release src/FetchUnityProjectInfo.cs
+    - name: Restore unity project cache
+      if: contains(runner.labels, 'self-hosted')
+      uses: actions/cache@v4
+      with:
+        path: ${{ inputs.unity-project-path }}/Library
+        key: unity-cache-${{ steps.info.outputs.name }}
+        upload-chunk-size: ${{ inputs.upload-chunk-size }}
+        fail-on-cache-miss: ${{ inputs.fail-on-cache-miss }}
+        lookup-only: ${{ inputs.lookup-only }}
