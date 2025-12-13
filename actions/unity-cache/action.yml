@@ -34,39 +34,49 @@ runs:
         dotnet-version: "10.0.x"
     - name: Fetch unity project info (Windows)
       if: runner.os == 'Windows'
-      id: info
+      id: info-windows
       env:
         UNITY_PROJECT_PATH: ${{ inputs.unity-project-path }}
       run: dotnet run -c Release src/share/FetchUnityProjectInfo.cs
       shell: cmd
     - name: Fetch unity project info (Other)
       if: runner.os != 'Windows'
-      id: info
+      id: info-other
       env:
         UNITY_PROJECT_PATH: ${{ inputs.unity-project-path }}
       run: dotnet run -c Release src/share/FetchUnityProjectInfo.cs
       shell: bash
     - name: Restore unity project cache
-      if: ${{ !contains(runner.labels, 'self-hosted') }}
-      id: unity-cache
+      if: ${{ !contains(runner.labels, 'self-hosted') && runner.os == 'Windows' }}
+      id: unity-cache-windows
       uses: actions/cache@v4
       with:
         path: ${{ inputs.unity-project-path }}/Library
-        key: unity-cache-${{ steps.info.outputs.name }}
+        key: unity-cache-${{ steps.info-windows.outputs.name }}
+        upload-chunk-size: ${{ inputs.upload-chunk-size }}
+        fail-on-cache-miss: ${{ inputs.fail-on-cache-miss }}
+        lookup-only: ${{ inputs.lookup-only }}
+    - name: Restore unity project cache
+      if: ${{ !contains(runner.labels, 'self-hosted') && runner.os != 'Windows' }}
+      id: unity-cache-other
+      uses: actions/cache@v4
+      with:
+        path: ${{ inputs.unity-project-path }}/Library
+        key: unity-cache-${{ steps.info-other.outputs.name }}
         upload-chunk-size: ${{ inputs.upload-chunk-size }}
         fail-on-cache-miss: ${{ inputs.fail-on-cache-miss }}
         lookup-only: ${{ inputs.lookup-only }}
     - name: Set outputs (Windows)
       if: runner.os == 'Windows'
       env:
-        UNITY_CACHE_HIT: ${{ steps.unity-cache.outputs.cache-hit }}
+        UNITY_CACHE_HIT: ${{ steps.unity-cache-windows.outputs.cache-hit }}
         NUGET_CACHE_HIT: false
       run: dotnet run -c Release src/cache/SetOutPuts.cs
       shell: cmd
     - name: Set outputs (Other)
       if: runner.os != 'Windows'
       env:
-        UNITY_CACHE_HIT: ${{ steps.unity-cache.outputs.cache-hit }}
+        UNITY_CACHE_HIT: ${{ steps.unity-cache-other.outputs.cache-hit }}
         NUGET_CACHE_HIT: false
       run: dotnet run -c Release src/cache/SetOutPuts.cs
       shell: bash
