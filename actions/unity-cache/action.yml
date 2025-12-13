@@ -32,11 +32,20 @@ runs:
       uses: actions/setup-dotnet@v5
       with:
         dotnet-version: "10.0.x"
-    - name: Fetch unity project info
+    - name: Fetch unity project info (Windows)
+      if: runner.os == 'Windows'
       id: info
       env:
         UNITY_PROJECT_PATH: ${{ inputs.unity-project-path }}
       run: dotnet run -c Release src/share/FetchUnityProjectInfo.cs
+      shell: cmd
+    - name: Fetch unity project info (Other)
+      if: runner.os != 'Windows'
+      id: info
+      env:
+        UNITY_PROJECT_PATH: ${{ inputs.unity-project-path }}
+      run: dotnet run -c Release src/share/FetchUnityProjectInfo.cs
+      shell: bash
     - name: Restore unity project cache
       if: ${{ !contains(runner.labels, 'self-hosted') }}
       id: unity-cache
@@ -47,8 +56,17 @@ runs:
         upload-chunk-size: ${{ inputs.upload-chunk-size }}
         fail-on-cache-miss: ${{ inputs.fail-on-cache-miss }}
         lookup-only: ${{ inputs.lookup-only }}
-    - name: Set outputs
+    - name: Set outputs (Windows)
+      if: runner.os == 'Windows'
       env:
         UNITY_CACHE_HIT: ${{ steps.unity-cache.outputs.cache-hit }}
         NUGET_CACHE_HIT: false
       run: dotnet run -c Release src/cache/SetOutPuts.cs
+      shell: cmd
+    - name: Set outputs (Other)
+      if: runner.os != 'Windows'
+      env:
+        UNITY_CACHE_HIT: ${{ steps.unity-cache.outputs.cache-hit }}
+        NUGET_CACHE_HIT: false
+      run: dotnet run -c Release src/cache/SetOutPuts.cs
+      shell: bash
