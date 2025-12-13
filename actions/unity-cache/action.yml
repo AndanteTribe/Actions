@@ -38,7 +38,7 @@ runs:
         UNITY_PROJECT_PATH: ${{ inputs.unity-project-path }}
       run: dotnet run -c Release src/share/FetchUnityProjectInfo.cs
     - name: Restore unity project cache
-      if: contains(runner.labels, 'self-hosted')
+      if: ${{ !contains(runner.labels, 'self-hosted') }}
       id: unity-cache
       uses: actions/cache@v4
       with:
