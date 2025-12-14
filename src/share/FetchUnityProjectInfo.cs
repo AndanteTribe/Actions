@@ -7,7 +7,7 @@ if (string.IsNullOrEmpty(projectPath) || !Directory.Exists(projectPath))
     Environment.Exit(1);
 }
 
-var name = Path.GetFileName(projectPath.AsSpan());
+var name = Path.GetFileName(Path.GetDirectoryName(projectPath.AsSpan()));
 
 var output = Environment.GetEnvironmentVariable("GITHUB_OUTPUT");
 if (!string.IsNullOrEmpty(output))
