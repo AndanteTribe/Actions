@@ -40,7 +40,7 @@ runs:
         UNITY_PROJECT_PATH: ${{ inputs.unity-project-path }}
       run: dotnet run -c Release src/share/FetchUnityProjectInfo.cs
       shell: cmd
-      working-directory: ${{ github.action_path }}
+      working-directory: ${{ github.action_path }}/../..
 
     - name: Fetch unity project info (Mac/Linux)
       if: runner.os != 'Windows'
@@ -80,7 +80,7 @@ runs:
         NUGET_CACHE_HIT: false
       run: dotnet run -c Release src/cache/SetOutPuts.cs
       shell: cmd
-      working-directory: ${{ github.action_path }}
+      working-directory: ${{ github.action_path }}/../..
 
     - name: Set outputs (Mac/Linux)
       if: runner.os != 'Windows'
@@ -89,4 +89,4 @@ runs:
         NUGET_CACHE_HIT: false
       run: dotnet run -c Release src/cache/SetOutPuts.cs
       shell: bash
-      working-directory: ${{ github.action_path }}
+      working-directory: ${{ github.action_path }}/../..
