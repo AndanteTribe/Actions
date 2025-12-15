@@ -8,7 +8,7 @@ if (string.IsNullOrEmpty(projectPath) || !Directory.Exists(projectPath))
 }
 
 var workspace = Environment.GetEnvironmentVariable("GITHUB_WORKSPACE");
-if(string.IsNullOrEmpty(workspace))
+if (string.IsNullOrEmpty(workspace))
 {
     Console.Error.WriteLine("The GITHUB_WORKSPACE environment variable is not set.");
     Environment.Exit(1);
