@@ -7,6 +7,7 @@ if (string.IsNullOrEmpty(projectPath) || !Directory.Exists(projectPath))
     Environment.Exit(1);
 }
 
+// このファイルをactionsで実行するとき、カレントディレクトリはactions/unity-cacheになるので、GITHUB_WORKSPACEを使ってUnityのプロジェクトパスを取得しなければいけない
 var name = Path.GetFileName(Path.GetFullPath(Path.Combine(Environment.GetEnvironmentVariable("GITHUB_WORKSPACE"), projectPath)));
 
 var output = Environment.GetEnvironmentVariable("GITHUB_OUTPUT");
