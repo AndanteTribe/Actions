@@ -9,11 +9,11 @@ if (string.IsNullOrEmpty(projectPath) || !Directory.Exists(projectPath))
 
 var workspace = Environment.GetEnvironmentVariable("GITHUB_WORKSPACE");
 var combined =
-    Path.IsPathRooted(projectPathInput) || string.IsNullOrEmpty(workspace)
-        ? projectPathInput
-        : Path.Combine(workspace, projectPathInput);
+    Path.IsPathRooted(projectPath) || string.IsNullOrEmpty(workspace)
+        ? projectPath
+        : Path.Combine(workspace, projectPath);
 
-var projectPath = Path.GetFullPath(combined);
+projectPath = Path.GetFullPath(combined);
 
 if (!Directory.Exists(projectPath))
 {
