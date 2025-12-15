@@ -8,8 +8,7 @@ if (string.IsNullOrEmpty(projectPath) || !Directory.Exists(projectPath))
 }
 
 var workspace = Environment.GetEnvironmentVariable("GITHUB_WORKSPACE");
-
-var name = Path.GetFileName(Path.GetFullPath(projectPath));
+var name = Path.GetFileName(Path.GetFullPath(Path.Combine(workspace, projectPath))).Name;
 
 var output = Environment.GetEnvironmentVariable("GITHUB_OUTPUT");
 if (!string.IsNullOrEmpty(output))
