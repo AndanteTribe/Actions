@@ -7,8 +7,14 @@ if (string.IsNullOrEmpty(projectPath) || !Directory.Exists(projectPath))
     Environment.Exit(1);
 }
 
+var workspace = Environment.GetEnvironmentVariable("GITHUB_WORKSPACE");
+if (string.IsNullOrEmpty(workspace))
+{
+    Console.Error.WriteLine("The GITHUB_WORKSPACE environment variable is not set.");
+    Environment.Exit(1);
+}
 // このファイルをactionsで実行するとき、カレントディレクトリはactions/unity-cacheになるので、GITHUB_WORKSPACEを使ってUnityのプロジェクトパスを取得しなければいけない
-var name = Path.GetFileName(Path.GetFullPath(Path.Combine(Environment.GetEnvironmentVariable("GITHUB_WORKSPACE"), projectPath)));
+var name = Path.GetFileName(Path.GetFullPath(Path.Combine(workspace, projectPath)));
 
 var output = Environment.GetEnvironmentVariable("GITHUB_OUTPUT");
 if (!string.IsNullOrEmpty(output))
