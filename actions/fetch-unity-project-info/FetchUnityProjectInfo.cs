@@ -1,9 +1,9 @@
 using System;
 using System.IO;
-var projectPath = Environment.GetEnvironmentVariable("INPUT_UNITY-PROJECT-PATH");
+var projectPath = Environment.GetEnvironmentVariable("INPUT_UNITY_PROJECT_PATH");
 if (string.IsNullOrEmpty(projectPath) || !Directory.Exists(projectPath))
 {
-    Console.Error.WriteLine("The UNITY_PROJECT_PATH environment variable is either not set or an invalid path.");
+    Console.Error.WriteLine("The INPUT_UNITY_PROJECT_PATH environment variable is either not set or an invalid path.");
     Environment.Exit(1);
 }
 
