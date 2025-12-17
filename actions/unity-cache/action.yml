@@ -28,65 +28,25 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: Setup dotnet
-      uses: actions/setup-dotnet@v5
+    - name: Fetch unity project info
+      id: info
+      uses: ./../fetch-unity-project-info
       with:
-        dotnet-version: "10.0.x"
+        unity-project-path: ${{ inputs.unity-project-path }}
 
-    - name: Fetch unity project info (Windows)
-      if: runner.os == 'Windows'
-      id: info-windows
-      env:
-        UNITY_PROJECT_PATH: ${{ inputs.unity-project-path }}
-      run: dotnet run -c Release src/share/FetchUnityProjectInfo.cs
-      shell: cmd
-      working-directory: ${{ github.action_path }}/../..
-
-    - name: Fetch unity project info (Mac/Linux)
-      if: runner.os != 'Windows'
-      id: info-unix
-      env:
-        UNITY_PROJECT_PATH: ${{ inputs.unity-project-path }}
-      run: dotnet run -c Release src/share/FetchUnityProjectInfo.cs
-      shell: bash
-      working-directory: ${{ github.action_path }}/../..
-
-    - name: Restore unity project cache (Windows)
-      if: ${{ !contains(runner.labels, 'self-hosted') && runner.os == 'Windows' }}
-      id: unity-cache-windows
+    - name: Restore unity project cache
+      if: ${{ !contains(runner.labels, 'self-hosted') }}
+      id: unity-cache
       uses: actions/cache@v4
       with:
         path: ${{ inputs.unity-project-path }}/Library
-        key: unity-cache-${{ steps.info-windows.outputs.name }}
+        key: unity-cache-${{ steps.info.outputs.name }}
         upload-chunk-size: ${{ inputs.upload-chunk-size }}
         fail-on-cache-miss: ${{ inputs.fail-on-cache-miss }}
         lookup-only: ${{ inputs.lookup-only }}
 
-    - name: Restore unity project cache (Mac/Linux)
-      if: ${{ !contains(runner.labels, 'self-hosted') && runner.os != 'Windows' }}
-      id: unity-cache-unix
-      uses: actions/cache@v4
+    - name: Set outputs
+      uses: ./../set-outputs
       with:
-        path: ${{ inputs.unity-project-path }}/Library
-        key: unity-cache-${{ steps.info-unix.outputs.name }}
-        upload-chunk-size: ${{ inputs.upload-chunk-size }}
-        fail-on-cache-miss: ${{ inputs.fail-on-cache-miss }}
-        lookup-only: ${{ inputs.lookup-only }}
-
-    - name: Set outputs (Windows)
-      if: runner.os == 'Windows'
-      env:
-        UNITY_CACHE_HIT: ${{ steps.unity-cache-windows.outputs.cache-hit }}
-        NUGET_CACHE_HIT: false
-      run: dotnet run -c Release src/cache/SetOutPuts.cs
-      shell: cmd
-      working-directory: ${{ github.action_path }}/../..
-
-    - name: Set outputs (Mac/Linux)
-      if: runner.os != 'Windows'
-      env:
-        UNITY_CACHE_HIT: ${{ steps.unity-cache-unix.outputs.cache-hit }}
-        NUGET_CACHE_HIT: false
-      run: dotnet run -c Release src/cache/SetOutPuts.cs
-      shell: bash
-      working-directory: ${{ github.action_path }}/../..
+        unity-cache-hit: ${{ steps.unity-cache.outputs.cache-hit }}
+        nuget-cache-hit: false

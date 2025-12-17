@@ -1,0 +1,15 @@
+name: 'Fetch Unity Project Info'
+description: 'Fetch Unity project information for cache key generation.'
+author: 'AndanteTribe'
+inputs:
+  unity-project-path:
+    description: 'A directory path for the Unity project'
+    required: true
+outputs:
+  name:
+    description: 'The name of the Unity project'
+runs:
+  using: 'docker'
+  image: '../../src/share/Dockerfile'
+  env:
+    UNITY_PROJECT_PATH: ${{ inputs.unity-project-path }}
