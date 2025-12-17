@@ -28,21 +28,11 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: Build fetch-unity-project-info image
-      shell: bash
-      run: docker build -t fetch-unity-project-info:latest ${{ github.action_path }}/../../src/share
-
     - name: Fetch unity project info
       id: info
-      shell: bash
-      run: |
-        docker run --rm \
-          -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" \
-          -e UNITY_PROJECT_PATH="${{ inputs.unity-project-path }}" \
-          -e GITHUB_WORKSPACE="$GITHUB_WORKSPACE" \
-          -e GITHUB_OUTPUT="$GITHUB_OUTPUT" \
-          -v "$GITHUB_OUTPUT:$GITHUB_OUTPUT" \
-          fetch-unity-project-info:latest
+      uses: ./../fetch-unity-project-info
+      with:
+        unity-project-path: ${{ inputs.unity-project-path }}
 
     - name: Restore unity project cache
       if: ${{ !contains(runner.labels, 'self-hosted') }}
@@ -55,16 +45,8 @@ runs:
         fail-on-cache-miss: ${{ inputs.fail-on-cache-miss }}
         lookup-only: ${{ inputs.lookup-only }}
 
-    - name: Build set-outputs image
-      shell: bash
-      run: docker build -t set-outputs:latest ${{ github.action_path }}/../../src/cache
-
     - name: Set outputs
-      shell: bash
-      run: |
-        docker run --rm \
-          -e UNITY_CACHE_HIT="${{ steps.unity-cache.outputs.cache-hit }}" \
-          -e NUGET_CACHE_HIT="false" \
-          -e GITHUB_OUTPUT="$GITHUB_OUTPUT" \
-          -v "$GITHUB_OUTPUT:$GITHUB_OUTPUT" \
-          set-outputs:latest
+      uses: ./../set-outputs
+      with:
+        unity-cache-hit: ${{ steps.unity-cache.outputs.cache-hit }}
+        nuget-cache-hit: false

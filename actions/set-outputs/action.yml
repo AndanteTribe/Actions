@@ -1,0 +1,13 @@
+name: 'Set Outputs'
+description: 'Set GitHub Action outputs for Unity cache.'
+author: 'AndanteTribe'
+inputs:
+  unity-cache-hit:
+    description: 'Unity cache hit status'
+    required: true
+  nuget-cache-hit:
+    description: 'NuGet cache hit status'
+    required: true
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
