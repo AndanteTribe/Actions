@@ -1,7 +1,7 @@
 using System;
 using System.IO;
-var unityCacheHit = Environment.GetEnvironmentVariable("UNITY_CACHE_HIT") ?? "false";
-var nugetCacheHit = Environment.GetEnvironmentVariable("NUGET_CACHE_HIT") ?? "false";
+var unityCacheHit = Environment.GetEnvironmentVariable("INPUT_UNITY-CACHE-HIT") ?? "false";
+var nugetCacheHit = Environment.GetEnvironmentVariable("INPUT_NUGET-CACHE-HIT") ?? "false";
 
 var output = Environment.GetEnvironmentVariable("GITHUB_OUTPUT");
 if (!string.IsNullOrEmpty(output))
