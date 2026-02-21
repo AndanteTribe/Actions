@@ -4,5 +4,5 @@ WORKDIR /work
 ENV PATH="${PATH}:/root/.dotnet/tools"
 RUN dotnet tool install --global NuGetForUnity.Cli
 
-COPY ${UNITY_PROJECT_PATH}  . 
+COPY . .
 ENTRYPOINT ["nugetforunity", "restore"]
