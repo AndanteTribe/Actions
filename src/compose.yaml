@@ -22,7 +22,7 @@ services:
   nugetforunity-restore:
     build:
       context: ${UNITY_PROJECT_PATH}
-      dockerfile: ${NUGET_DOCKERFILE_PATH}
+      dockerfile: Dockerfile.nuget
       args:
         UNITY_PROJECT_PATH: ${UNITY_PROJECT_PATH}
     command: ${UNITY_PROJECT_PATH}
