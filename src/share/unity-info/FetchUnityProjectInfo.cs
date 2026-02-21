@@ -16,5 +16,11 @@ if (string.IsNullOrEmpty(workspace))
 // このファイルをactionsで実行するとき、カレントディレクトリはactions/unity-cacheになるので、GITHUB_WORKSPACEを使ってUnityのプロジェクトパスを取得しなければいけない
 var name = Path.GetFileName(Path.GetFullPath(Path.Combine(workspace, projectPath)));
 
-Console.Write("name=");
-Console.WriteLine(name);
+var output = Environment.GetEnvironmentVariable("GITHUB_OUTPUT");
+if (!string.IsNullOrEmpty(output))
+{
+    using var writer = File.AppendText(output);
+
+    writer.Write("name=");
+    writer.WriteLine(name);
+}
