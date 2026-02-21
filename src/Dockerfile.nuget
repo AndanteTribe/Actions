@@ -4,4 +4,4 @@ WORKDIR /app
 ENV PATH="${PATH}:/root/.dotnet/tools"
 RUN dotnet tool install --global NuGetForUnity.Cli
 
-ENTRYPOINT ["dotnet", "nugetforunity", "restore"]
+ENTRYPOINT ["nugetforunity", "restore"]
