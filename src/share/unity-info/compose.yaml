@@ -4,7 +4,7 @@ services:
       context: .
     volumes:
       - ${GITHUB_WORKSPACE}:${GITHUB_WORKSPACE}
-      - ${GITHUB_OUTPUT_DIR}:${GITHUB_OUTPUT_DIR}
+      - ${GITHUB_OUTPUT}:${GITHUB_OUTPUT}
     environment:
       - UNITY_PROJECT_PATH
       - GITHUB_WORKSPACE

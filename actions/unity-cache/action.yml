@@ -48,7 +48,6 @@ runs:
       env:
         UNITY_PROJECT_PATH: ${{ inputs.unity-project-path }}
       run: |
-        export GITHUB_OUTPUT_DIR=$(dirname "$GITHUB_OUTPUT")
         docker compose -f "${{ github.action_path }}/../../src/share/unity-info/compose.yaml" run --rm fetch-unity-info
       shell: bash
 
