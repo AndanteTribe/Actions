@@ -67,7 +67,6 @@ runs:
       if: ${{ inputs.use-nugetforunity == 'true' && steps.nuget-cache.outputs.cache-hit != 'true' }}
       env:
         UNITY_PROJECT_PATH: ${{ github.workspace }}/${{ inputs.unity-project-path }}
-        NUGET_PACKAGES_PATH: ${{ github.workspace }}/${{ inputs.nuget-packages-path }}
       run: docker compose run --rm nugetforunity-restore
       shell: bash
       working-directory: ${{ github.action_path }}/../../src
