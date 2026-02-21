@@ -20,6 +20,9 @@ inputs:
     description: 'Supports cache resolution and cache management via NuGetForUnity.Cli in Unity projects using NuGetForUnity.'
     default: 'false'
     required: false
+  nuget-packages-path:
+    description: 'A directory path where NuGetForUnity downloads packages. Used when use-nugetforunity is true.'
+    required: false
 outputs:
   cache-hit-unity:
     description: 'A boolean value indicating that the cache for the target Unity project has been found.'
@@ -54,7 +57,7 @@ runs:
       id: nuget-cache
       uses: actions/cache@v4
       with:
-        path: ${{ inputs.unity-project-path }}/Assets/Packages
+        path: ${{ inputs.nuget-packages-path }}
         key: nuget-cache-${{ steps.info.outputs.name }}-${{ hashFiles(format('{0}/**/packages.config', inputs.unity-project-path)) }}
         upload-chunk-size: ${{ inputs.upload-chunk-size }}
         fail-on-cache-miss: ${{ inputs.fail-on-cache-miss }}
