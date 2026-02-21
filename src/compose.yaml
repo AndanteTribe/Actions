@@ -1,0 +1,21 @@
+services:
+  set-outputs:
+    build:
+      context: .
+    command: ["cache/SetOutputs.cs"]
+    volumes:
+      - ${GITHUB_OUTPUT}:${GITHUB_OUTPUT}
+    environment:
+      - UNITY_CACHE_HIT
+      - NUGET_CACHE_HIT
+      - GITHUB_OUTPUT
+  fetch-unity-info:
+    build:
+      context: .
+    command: ["share/FetchUnityProjectInfo.cs"]
+    volumes:
+      - ${GITHUB_OUTPUT}:${GITHUB_OUTPUT}
+    environment:
+      - UNITY_PROJECT_PATH
+      - GITHUB_WORKSPACE
+      - GITHUB_OUTPUT
