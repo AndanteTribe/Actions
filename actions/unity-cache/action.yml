@@ -49,10 +49,30 @@ runs:
         fail-on-cache-miss: ${{ inputs.fail-on-cache-miss }}
         lookup-only: ${{ inputs.lookup-only }}
 
+    - name: Restore nuget cache
+      if: ${{ inputs.use-nugetforunity == 'true' && !contains(runner.labels, 'self-hosted') }}
+      id: nuget-cache
+      uses: actions/cache@v4
+      with:
+        path: ${{ inputs.unity-project-path }}/Assets/Packages
+        key: nuget-cache-${{ steps.info.outputs.name }}-${{ hashFiles(format('{0}/**/packages.config', inputs.unity-project-path)) }}
+        upload-chunk-size: ${{ inputs.upload-chunk-size }}
+        fail-on-cache-miss: ${{ inputs.fail-on-cache-miss }}
+        lookup-only: ${{ inputs.lookup-only }}
+
+    - name: Run NuGetForUnity restore
+      if: ${{ inputs.use-nugetforunity == 'true' && steps.nuget-cache.outputs.cache-hit != 'true' }}
+      env:
+        UNITY_PROJECT_PATH: ${{ inputs.unity-project-path }}
+        GITHUB_WORKSPACE: ${{ github.workspace }}
+      run: docker compose run --rm nugetforunity-restore
+      shell: bash
+      working-directory: ${{ github.action_path }}/../../src
+
     - name: Set outputs
       env:
         UNITY_CACHE_HIT: ${{ steps.unity-cache.outputs.cache-hit }}
-        NUGET_CACHE_HIT: false
+        NUGET_CACHE_HIT: ${{ steps.nuget-cache.outputs.cache-hit || 'false' }}
         GITHUB_OUTPUT: ${{ env.GITHUB_OUTPUT }}
       run: docker compose run --rm set-outputs
       shell: bash
