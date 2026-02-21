@@ -28,11 +28,6 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: Setup dotnet
-      uses: actions/setup-dotnet@v5
-      with:
-        dotnet-version: "10.0.x"
-
     - name: Fetch unity project info
       id: info
       env:
@@ -52,20 +47,10 @@ runs:
         fail-on-cache-miss: ${{ inputs.fail-on-cache-miss }}
         lookup-only: ${{ inputs.lookup-only }}
 
-    - name: Set outputs (Windows)
-      if: runner.os == 'Windows'
+    - name: Set outputs
       env:
         UNITY_CACHE_HIT: ${{ steps.unity-cache.outputs.cache-hit }}
         NUGET_CACHE_HIT: false
-      run: dotnet run -c Release src/cache/SetOutPuts.cs
-      shell: cmd
-      working-directory: ${{ github.action_path }}/../..
-
-    - name: Set outputs (Mac/Linux)
-      if: runner.os != 'Windows'
-      env:
-        UNITY_CACHE_HIT: ${{ steps.unity-cache.outputs.cache-hit }}
-        NUGET_CACHE_HIT: false
-      run: dotnet run -c Release src/cache/SetOutPuts.cs
+      run: docker compose run --rm set-outputs
       shell: bash
-      working-directory: ${{ github.action_path }}/../..
+      working-directory: ${{ github.action_path }}/../../src/cache/set-outputs
