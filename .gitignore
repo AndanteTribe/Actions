@@ -41,6 +41,9 @@ ScaffoldingReadMe.txt
 *~
 CodeCoverage/
 
+# Local compose output
+src/share/unity-info/output/
+
 # MSBuild Binary and Structured Log
 *.binlog
 
