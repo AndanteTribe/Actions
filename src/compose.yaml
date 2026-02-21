@@ -23,8 +23,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.nuget
+    command: ${UNITY_PROJECT_PATH}
     volumes:
-      - ${GITHUB_WORKSPACE}:${GITHUB_WORKSPACE}
+      - ${NUGET_PACKAGES_PATH}:${NUGET_PACKAGES_PATH}
     environment:
       - UNITY_PROJECT_PATH
-      - GITHUB_WORKSPACE
+      - NUGET_PACKAGES_PATH

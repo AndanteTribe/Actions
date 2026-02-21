@@ -4,4 +4,4 @@ WORKDIR /app
 RUN dotnet tool install --global NuGetForUnity.Cli
 ENV PATH="${PATH}:/root/.dotnet/tools"
 
-ENTRYPOINT ["sh", "-c", "cd \"${GITHUB_WORKSPACE}\" && dotnet nugetforunity restore \"${UNITY_PROJECT_PATH}\""]
+ENTRYPOINT ["dotnet", "nugetforunity", "restore"]
