@@ -48,14 +48,8 @@ runs:
       env:
         UNITY_PROJECT_PATH: ${{ inputs.unity-project-path }}
       run: |
-        docker build -t unity-info "${{ github.action_path }}/../../src/share/unity-info/"
-        docker run --rm \
-          -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" \
-          -v "$(dirname "$GITHUB_OUTPUT"):$(dirname "$GITHUB_OUTPUT")" \
-          -e UNITY_PROJECT_PATH \
-          -e GITHUB_WORKSPACE \
-          -e GITHUB_OUTPUT \
-          unity-info
+        export GITHUB_OUTPUT_DIR=$(dirname "$GITHUB_OUTPUT")
+        docker compose -f "${{ github.action_path }}/../../src/share/unity-info/compose.yaml" run --rm fetch-unity-info
       shell: bash
 
     - name: Restore unity project cache (Windows)
