@@ -23,11 +23,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.nuget
-      additional_contexts:
-        unity-project: ${UNITY_PROJECT_PATH}
-      args:
-        UNITY_PROJECT_PATH: ${UNITY_PROJECT_PATH}
-    command: ${UNITY_PROJECT_PATH}
     volumes:
       - ${NUGET_PACKAGES_PATH}:${NUGET_PACKAGES_PATH}
     environment:
