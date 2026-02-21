@@ -2,10 +2,6 @@ services:
   fetch-unity-info:
     build:
       context: .
-    volumes:
-      - ${GITHUB_WORKSPACE}:${GITHUB_WORKSPACE}
-      - ${GITHUB_OUTPUT}:${GITHUB_OUTPUT}
     environment:
       - UNITY_PROJECT_PATH
       - GITHUB_WORKSPACE
-      - GITHUB_OUTPUT
