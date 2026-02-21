@@ -22,9 +22,10 @@ services:
   nugetforunity-restore:
     build:
       context: $UNITY_PROJECT_PATH
-      dockerfile: ./Dockerfile.nuget
+      dockerfile: ${GITHUB_WORKSPACE}/src/Dockerfile.nuget
     volumes:
       - ${NUGET_PACKAGES_PATH}:${NUGET_PACKAGES_PATH}
     environment:
       - UNITY_PROJECT_PATH
       - NUGET_PACKAGES_PATH
+      - GITHUB_WORKSPACE
