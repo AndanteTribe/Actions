@@ -69,12 +69,9 @@ runs:
         UNITY_PROJECT_PATH: ${{ github.workspace }}/${{ inputs.unity-project-path }}
         NUGET_PACKAGES_PATH: ${{ github.workspace }}/${{ inputs.nuget-packages-path }}
       run: |
-        docker compose build nugetforunity-restore
         REL_PACKAGES="${NUGET_PACKAGES_PATH#${UNITY_PROJECT_PATH}/}"
-        CID=$(docker create --volume "${NUGET_PACKAGES_PATH}:/work/${REL_PACKAGES}" nugetforunity-restore)
-        docker cp "${UNITY_PROJECT_PATH}/." "${CID}:/work/"
-        docker start --attach "${CID}"
-        docker rm "${CID}"
+        docker build -t nugetforunity-restore -f Dockerfile.nuget "${UNITY_PROJECT_PATH}"
+        docker run --rm --volume "${NUGET_PACKAGES_PATH}:/work/${REL_PACKAGES}" nugetforunity-restore
       shell: bash
       working-directory: ${{ github.action_path }}/../../src
 

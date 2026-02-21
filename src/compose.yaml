@@ -19,8 +19,3 @@ services:
       - UNITY_PROJECT_PATH
       - GITHUB_WORKSPACE
       - GITHUB_OUTPUT
-  nugetforunity-restore:
-    build:
-      context: .
-      dockerfile: Dockerfile.nuget
-    image: nugetforunity-restore
