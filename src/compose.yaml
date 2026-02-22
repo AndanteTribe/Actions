@@ -30,3 +30,6 @@ services:
     command: ${UNITY_PROJECT_PATH}
     volumes:
       - ${NUGET_PACKAGES_PATH}:${NUGET_PACKAGES_PATH}
+    environment:
+      - ${NUGET_PACKAGES_PATH}:${NUGET_PACKAGES_PATH}
+      - ${UNITY_PROJECT_PATH}:${UNITY_PROJECT_PATH}
