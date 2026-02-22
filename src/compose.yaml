@@ -19,6 +19,19 @@ services:
       - UNITY_PROJECT_PATH
       - GITHUB_WORKSPACE
       - GITHUB_OUTPUT
+  restore-local-cache:
+    build:
+      context: .
+    command: ["cache/RestoreLocalCache.cs"]
+    volumes:
+      - ${GITHUB_OUTPUT}:${GITHUB_OUTPUT}
+      - ${GITHUB_WORKSPACE}:${GITHUB_WORKSPACE}
+      - ${LOCAL_CACHE_PATH}:${LOCAL_CACHE_PATH}
+    environment:
+      - LOCAL_CACHE_PATH
+      - SOURCE_PATH
+      - CACHE_KEY
+      - GITHUB_OUTPUT
   nugetforunity-restore:
     build:
       context: .
@@ -30,3 +43,6 @@ services:
     command: ${UNITY_PROJECT_PATH}
     volumes:
       - ${NUGET_PACKAGES_PATH}:${NUGET_PACKAGES_PATH}
+    environment:
+      - ${NUGET_PACKAGES_PATH}:${NUGET_PACKAGES_PATH}
+      - ${UNITY_PROJECT_PATH}:${UNITY_PROJECT_PATH}
