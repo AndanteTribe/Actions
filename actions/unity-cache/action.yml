@@ -20,6 +20,9 @@ inputs:
     description: 'Supports cache resolution and cache management via NuGetForUnity.Cli in Unity projects using NuGetForUnity.'
     default: 'false'
     required: false
+  nuget-packages-path:
+    description: 'A directory path where NuGetForUnity downloads packages. Used when use-nugetforunity is true.'
+    required: false
 outputs:
   cache-hit-unity:
     description: 'A boolean value indicating that the cache for the target Unity project has been found.'
