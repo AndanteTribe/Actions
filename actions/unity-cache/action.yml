@@ -20,6 +20,13 @@ inputs:
     description: 'Supports cache resolution and cache management via NuGetForUnity.Cli in Unity projects using NuGetForUnity.'
     default: 'false'
     required: false
+  nuget-packages-path:
+    description: 'A directory path for NuGet packages. Required when use-nugetforunity is true.'
+    required: false
+  local-cache-path:
+    description: 'Local directory path for caching on self-hosted runners.'
+    default: '${{ github.workspace }}/cache'
+    required: false
 outputs:
   cache-hit-unity:
     description: 'A boolean value indicating that the cache for the target Unity project has been found.'
@@ -38,6 +45,62 @@ runs:
       shell: bash
       working-directory: ${{ github.action_path }}/../../src
 
+    - name: Setup local cache directory
+      if: ${{ contains(runner.labels, 'self-hosted') }}
+      run: |
+        mkdir -p "${{ inputs.local-cache-path }}"
+        echo "*" > "${{ inputs.local-cache-path }}/.gitignore"
+      shell: bash
+
+    - name: Restore unity project local cache
+      if: ${{ contains(runner.labels, 'self-hosted') }}
+      id: unity-local-cache
+      run: |
+        local_library="${{ inputs.local-cache-path }}/unity-cache-${{ steps.info.outputs.name }}"
+        library_path="${{ github.workspace }}/${{ inputs.unity-project-path }}/Library"
+        mkdir -p "${local_library}"
+        if [ "$(ls -A "${local_library}" 2>/dev/null)" ]; then
+          echo "cache-hit=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "cache-hit=false" >> "$GITHUB_OUTPUT"
+        fi
+        if [ -d "${library_path}" ] && [ ! -L "${library_path}" ]; then
+          if [ "$(ls -A "${local_library}" 2>/dev/null)" ]; then
+            rm -rf "${library_path}"
+          else
+            rm -rf "${local_library}" && mv "${library_path}" "${local_library}"
+          fi
+        fi
+        if [ ! -e "${library_path}" ]; then
+          ln -s "${local_library}" "${library_path}"
+        fi
+      shell: bash
+
+    - name: Restore nuget local cache
+      if: ${{ inputs.use-nugetforunity == 'true' && contains(runner.labels, 'self-hosted') }}
+      id: nuget-local-cache
+      run: |
+        local_nuget="${{ inputs.local-cache-path }}/nuget-cache-${{ steps.info.outputs.name }}"
+        nuget_path="${{ github.workspace }}/${{ inputs.nuget-packages-path }}"
+        mkdir -p "${local_nuget}"
+        if [ "$(ls -A "${local_nuget}" 2>/dev/null)" ]; then
+          echo "cache-hit=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "cache-hit=false" >> "$GITHUB_OUTPUT"
+        fi
+        if [ -d "${nuget_path}" ] && [ ! -L "${nuget_path}" ]; then
+          if [ "$(ls -A "${local_nuget}" 2>/dev/null)" ]; then
+            rm -rf "${nuget_path}"
+          else
+            rm -rf "${local_nuget}" && mv "${nuget_path}" "${local_nuget}"
+          fi
+        fi
+        if [ ! -e "${nuget_path}" ]; then
+          mkdir -p "$(dirname "${nuget_path}")"
+          ln -s "${local_nuget}" "${nuget_path}"
+        fi
+      shell: bash
+
     - name: Restore nuget cache
       if: ${{ inputs.use-nugetforunity == 'true' && !contains(runner.labels, 'self-hosted') }}
       id: nuget-cache
@@ -50,7 +113,7 @@ runs:
         lookup-only: ${{ inputs.lookup-only }}
 
     - name: Run NuGetForUnity restore
-      if: ${{ inputs.use-nugetforunity == 'true' && steps.nuget-cache.outputs.cache-hit != 'true' }}
+      if: ${{ inputs.use-nugetforunity == 'true' && steps.nuget-cache.outputs.cache-hit != 'true' && steps.nuget-local-cache.outputs.cache-hit != 'true' }}
       env:
         UNITY_PROJECT_PATH: ${{ github.workspace }}/${{ inputs.unity-project-path }}
         NUGET_PACKAGES_PATH: ${{ github.workspace }}/${{ inputs.nuget-packages-path }}
@@ -71,8 +134,8 @@ runs:
 
     - name: Set outputs
       env:
-        UNITY_CACHE_HIT: ${{ steps.unity-cache.outputs.cache-hit }}
-        NUGET_CACHE_HIT: ${{ steps.nuget-cache.outputs.cache-hit || 'false' }}
+        UNITY_CACHE_HIT: ${{ steps.unity-cache.outputs.cache-hit || steps.unity-local-cache.outputs.cache-hit }}
+        NUGET_CACHE_HIT: ${{ steps.nuget-cache.outputs.cache-hit || steps.nuget-local-cache.outputs.cache-hit || 'false' }}
         GITHUB_OUTPUT: ${{ env.GITHUB_OUTPUT }}
       run: docker compose run --rm set-outputs
       shell: bash
