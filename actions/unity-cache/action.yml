@@ -28,6 +28,16 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - name: Fetch unity project info
+      id: info
+      env:
+        UNITY_PROJECT_PATH: ${{ inputs.unity-project-path }}
+        GITHUB_WORKSPACE: ${{ github.workspace }}
+        GITHUB_OUTPUT: ${{ env.GITHUB_OUTPUT }}
+      run: docker compose run --rm fetch-unity-info
+      shell: bash
+      working-directory: ${{ github.action_path }}/../../src
+
     - name: Restore nuget cache
       if: ${{ inputs.use-nugetforunity == 'true' && !contains(runner.labels, 'self-hosted') }}
       id: nuget-cache
@@ -45,16 +55,6 @@ runs:
         UNITY_PROJECT_PATH: ${{ github.workspace }}/${{ inputs.unity-project-path }}
         NUGET_PACKAGES_PATH: ${{ github.workspace }}/${{ inputs.nuget-packages-path }}
       run: docker compose run --rm nugetforunity-restore
-      shell: bash
-      working-directory: ${{ github.action_path }}/../../src
-
-    - name: Fetch unity project info
-      id: info
-      env:
-        UNITY_PROJECT_PATH: ${{ inputs.unity-project-path }}
-        GITHUB_WORKSPACE: ${{ github.workspace }}
-        GITHUB_OUTPUT: ${{ env.GITHUB_OUTPUT }}
-      run: docker compose run --rm fetch-unity-info
       shell: bash
       working-directory: ${{ github.action_path }}/../../src
 
