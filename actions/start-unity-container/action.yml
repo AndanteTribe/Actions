@@ -30,6 +30,14 @@ outputs:
 runs:
   using: 'composite'
   steps:
+    - name: Build Unity container image
+      shell: bash
+      run: |
+        docker build \
+          --build-arg UNITY_IMAGE="unityci/editor:${{ inputs.unity-version }}-${{ inputs.target-platform }}-${{ inputs.editor-version }}" \
+          -t "unity-container-action:${{ inputs.unity-version }}-${{ inputs.target-platform }}-${{ inputs.editor-version }}" \
+          "$GITHUB_ACTION_PATH"
+
     - name: Start Unity container
       id: start-container
       shell: bash
@@ -46,20 +54,6 @@ runs:
           -e UNITY_PASSWORD \
           -v "${{ inputs.blank-project-path }}:/BlankProject" \
           -v "$PROJECT_PATH:/workspace" \
-          "unityci/editor:${{ inputs.unity-version }}-${{ inputs.target-platform }}-${{ inputs.editor-version }}" \
-          bash -c '
-            dbus-uuidgen > /etc/machine-id &&
-            mkdir -p /var/lib/dbus &&
-            ln -sf /etc/machine-id /var/lib/dbus/machine-id &&
-
-            unity-editor -batchmode -nographics -quit \
-              -serial "$UNITY_SERIAL" \
-              -username "$UNITY_EMAIL" \
-              -password "$UNITY_PASSWORD" \
-              -projectPath /BlankProject &&
-
-            # Keep the container alive so subsequent steps can exec into it
-            tail -f /dev/null
-          ')
+          "unity-container-action:${{ inputs.unity-version }}-${{ inputs.target-platform }}-${{ inputs.editor-version }}")
 
         echo "container-id=$CONTAINER_ID" >> "$GITHUB_OUTPUT"
