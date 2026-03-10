@@ -6,6 +6,8 @@ dbus-uuidgen > /etc/machine-id
 mkdir -p /var/lib/dbus
 ln -sf /etc/machine-id /var/lib/dbus/machine-id
 
+mkdir -p /BlankProject/Assets
+
 unity-editor -batchmode -nographics -quit \
   -serial "$UNITY_SERIAL" \
   -username "$UNITY_EMAIL" \
