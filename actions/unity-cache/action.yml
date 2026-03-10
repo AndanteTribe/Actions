@@ -33,9 +33,16 @@ runs:
   steps:
     - name: Fetch unity project info
       id: info
-      uses: ./actions/fetch-unity-info
-      with:
-        unity-project-path: ${{ inputs.unity-project-path }}
+      run: |
+        docker build -t andantetribe-fetch-unity-info "${{ github.action_path }}/../fetch-unity-info"
+        docker run --rm \
+          -e UNITY_PROJECT_PATH="${{ inputs.unity-project-path }}" \
+          -e GITHUB_WORKSPACE \
+          -e GITHUB_OUTPUT \
+          -v "${GITHUB_OUTPUT}:${GITHUB_OUTPUT}" \
+          andantetribe-fetch-unity-info \
+          share/FetchUnityProjectInfo.cs
+      shell: bash
 
     - name: Restore nuget cache
       if: ${{ inputs.use-nugetforunity == 'true' && !contains(runner.labels, 'self-hosted') }}
@@ -50,10 +57,14 @@ runs:
 
     - name: Run NuGetForUnity restore
       if: ${{ inputs.use-nugetforunity == 'true' && steps.nuget-cache.outputs.cache-hit != 'true' }}
-      uses: ./actions/nugetforunity-restore
-      with:
-        unity-project-path: ${{ inputs.unity-project-path }}
-        nuget-packages-path: ${{ inputs.nuget-packages-path }}
+      run: |
+        docker build -t andantetribe-nugetforunity-restore "${{ github.action_path }}/../nugetforunity-restore"
+        docker run --rm \
+          -v "${GITHUB_WORKSPACE}:${GITHUB_WORKSPACE}" \
+          -e NUGET_PACKAGES="${GITHUB_WORKSPACE}/${{ inputs.nuget-packages-path }}" \
+          andantetribe-nugetforunity-restore \
+          "${GITHUB_WORKSPACE}/${{ inputs.unity-project-path }}"
+      shell: bash
 
     - name: Restore unity project cache
       if: ${{ !contains(runner.labels, 'self-hosted') }}
@@ -67,7 +78,13 @@ runs:
         lookup-only: ${{ inputs.lookup-only }}
 
     - name: Set outputs
-      uses: ./actions/set-outputs
-      with:
-        unity-cache-hit: ${{ steps.unity-cache.outputs.cache-hit }}
-        nuget-cache-hit: ${{ steps.nuget-cache.outputs.cache-hit || 'false' }}
+      run: |
+        docker build -t andantetribe-set-outputs "${{ github.action_path }}/../set-outputs"
+        docker run --rm \
+          -e UNITY_CACHE_HIT="${{ steps.unity-cache.outputs.cache-hit }}" \
+          -e NUGET_CACHE_HIT="${{ steps.nuget-cache.outputs.cache-hit || 'false' }}" \
+          -e GITHUB_OUTPUT \
+          -v "${GITHUB_OUTPUT}:${GITHUB_OUTPUT}" \
+          andantetribe-set-outputs \
+          cache/SetOutputs.cs
+      shell: bash
