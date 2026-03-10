@@ -13,4 +13,4 @@ runs:
   env:
     UNITY_LICENSE: ${{ inputs.unity-license }}
   args:
-    - /app/share/GetUnitySerial.cs
+    - /app/GetUnitySerial.cs
