@@ -35,7 +35,15 @@ try
     if (!Convert.TryFromBase64Chars(base64Serial, serialBytes, out var bytesWritten))
     {
         Console.Error.WriteLine("Failed to decode the base64-encoded DeveloperData.");
-        Environment.Exit(1);
+        Environment.ExitCode = 1;
+        return;
+    }
+
+    if (bytesWritten <= 4)
+    {
+        Console.Error.WriteLine("The decoded DeveloperData is too short to contain the expected 4-byte prefix and serial.");
+        Environment.ExitCode = 1;
+        return;
     }
 
     // Skip the first 4 bytes and convert to string
