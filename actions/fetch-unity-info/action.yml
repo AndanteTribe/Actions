@@ -13,4 +13,4 @@ runs:
   env:
     UNITY_PROJECT_PATH: ${{ inputs.unity-project-path }}
   args:
-    - share/FetchUnityProjectInfo.cs
+    - /app/share/FetchUnityProjectInfo.cs

@@ -19,4 +19,4 @@ runs:
     UNITY_CACHE_HIT: ${{ inputs.unity-cache-hit }}
     NUGET_CACHE_HIT: ${{ inputs.nuget-cache-hit }}
   args:
-    - cache/SetOutputs.cs
+    - /app/cache/SetOutputs.cs
