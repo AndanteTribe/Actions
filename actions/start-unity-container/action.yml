@@ -2,15 +2,6 @@ name: 'Start Unity Container'
 description: 'Launch a Unity editor Docker container with license activation.'
 author: 'AndanteTribe'
 inputs:
-  unity-serial:
-    description: 'The Unity serial number for license activation.'
-    required: true
-  unity-email:
-    description: 'The Unity account email address for license activation.'
-    required: true
-  unity-password:
-    description: 'The Unity account password for license activation.'
-    required: true
   unity-version:
     description: 'The Unity editor version to use (e.g. 6000.3.2f1).'
     required: true
@@ -18,8 +9,9 @@ inputs:
     description: 'The target build platform (e.g. linux-il2cpp, windows-mono).'
     required: true
   editor-version:
-    description: 'The GameCI Unity editor image version (e.g. 3.2.1).'
-    required: true
+    description: 'The GameCI Unity editor image version (e.g. 3.2.1). Defaults to 3.2.1 if not specified.'
+    required: false
+    default: '3.2.1'
   project-path:
     description: 'The path to the Unity project to mount at /workspace inside the container.'
     required: true
@@ -41,10 +33,6 @@ runs:
     - name: Start Unity container
       id: start-container
       shell: bash
-      env:
-        UNITY_SERIAL: ${{ inputs.unity-serial }}
-        UNITY_EMAIL: ${{ inputs.unity-email }}
-        UNITY_PASSWORD: ${{ inputs.unity-password }}
       run: |
         mkdir -p "${{ inputs.blank-project-path }}/Assets"
 
