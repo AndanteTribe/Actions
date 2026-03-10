@@ -11,6 +11,6 @@ runs:
   using: docker
   image: Dockerfile
   env:
-    NUGET_PACKAGES: ${{ github.workspace }}/${{ inputs.nuget-packages-path }}
+    NUGET_PACKAGES: /github/workspace/${{ inputs.nuget-packages-path }}
   args:
-    - ${{ github.workspace }}/${{ inputs.unity-project-path }}
+    - /github/workspace/${{ inputs.unity-project-path }}
