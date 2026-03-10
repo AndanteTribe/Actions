@@ -1,0 +1,16 @@
+name: 'NuGetForUnity Restore'
+description: 'Restore NuGet packages for a Unity project using NuGetForUnity CLI.'
+inputs:
+  unity-project-path:
+    description: 'A directory path for the Unity project.'
+    required: true
+  nuget-packages-path:
+    description: 'A directory path where NuGetForUnity downloads packages.'
+    required: false
+runs:
+  using: docker
+  image: Dockerfile
+  env:
+    NUGET_PACKAGES: /github/workspace/${{ inputs.nuget-packages-path }}
+  args:
+    - /github/workspace/${{ inputs.unity-project-path }}

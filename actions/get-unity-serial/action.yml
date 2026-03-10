@@ -1,0 +1,16 @@
+name: 'Get Unity Serial'
+description: 'Extract Unity serial from UNITY_LICENSE and write to GITHUB_OUTPUT.'
+inputs:
+  unity-license:
+    description: 'The Unity license certificate.'
+    required: true
+outputs:
+  serial:
+    description: 'The Unity serial number extracted from the license.'
+runs:
+  using: docker
+  image: Dockerfile
+  env:
+    UNITY_LICENSE: ${{ inputs.unity-license }}
+  args:
+    - /app/share/GetUnitySerial.cs
