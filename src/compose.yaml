@@ -19,6 +19,15 @@ services:
       - UNITY_PROJECT_PATH
       - GITHUB_WORKSPACE
       - GITHUB_OUTPUT
+  get-unity-serial:
+    build:
+      context: .
+    command: ["share/GetUnitySerial.cs"]
+    volumes:
+      - ${GITHUB_OUTPUT}:${GITHUB_OUTPUT}
+    environment:
+      - UNITY_LICENSE
+      - GITHUB_OUTPUT
   nugetforunity-restore:
     build:
       context: .
