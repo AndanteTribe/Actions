@@ -12,8 +12,8 @@ inputs:
     description: 'The GameCI Unity editor image version (e.g. 3.2.1). Defaults to 3.2.1 if not specified.'
     required: false
     default: '3.2.1'
-  project-path:
-    description: 'The path to the Unity project to mount at /workspace inside the container.'
+  unity-project-path:
+    description: 'The path to the Unity project to mount at /workspace inside the container. Relative paths are resolved against the workspace root.'
     required: true
   blank-project-path:
     description: 'The path to use as a blank Unity project for license activation.'
@@ -36,13 +36,16 @@ runs:
       run: |
         mkdir -p "${{ inputs.blank-project-path }}/Assets"
 
+        PROJECT_PATH="${{ inputs.unity-project-path }}"
+        [[ "$PROJECT_PATH" = /* ]] || PROJECT_PATH="$GITHUB_WORKSPACE/$PROJECT_PATH"
+
         CONTAINER_ID=$(docker run -d \
           --name "${{ inputs.container-name }}" \
           -e UNITY_SERIAL \
           -e UNITY_EMAIL \
           -e UNITY_PASSWORD \
           -v "${{ inputs.blank-project-path }}:/BlankProject" \
-          -v "${{ inputs.project-path }}:/workspace" \
+          -v "$PROJECT_PATH:/workspace" \
           "unityci/editor:${{ inputs.unity-version }}-${{ inputs.target-platform }}-${{ inputs.editor-version }}" \
           bash -c '
             dbus-uuidgen > /etc/machine-id &&
