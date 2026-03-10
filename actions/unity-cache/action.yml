@@ -35,7 +35,7 @@ runs:
   steps:
     - name: Fetch unity project info
       id: info
-      uses: AndanteTribe/Actions/actions/fetch-unity-info@copilot/remove-compose-yml
+      uses: AndanteTribe/Actions/actions/fetch-unity-info@main
       with:
         unity-project-path: ${{ inputs.unity-project-path }}
 
@@ -52,7 +52,7 @@ runs:
 
     - name: Run NuGetForUnity restore
       if: ${{ inputs.use-nugetforunity == 'true' && steps.nuget-cache.outputs.cache-hit != 'true' }}
-      uses: AndanteTribe/Actions/actions/nugetforunity-restore@copilot/remove-compose-yml
+      uses: AndanteTribe/Actions/actions/nugetforunity-restore@main
       with:
         unity-project-path: ${{ inputs.unity-project-path }}
         nuget-packages-path: ${{ inputs.nuget-packages-path }}
@@ -70,7 +70,7 @@ runs:
 
     - name: Set outputs
       id: set-outputs
-      uses: AndanteTribe/Actions/actions/set-outputs@copilot/remove-compose-yml
+      uses: AndanteTribe/Actions/actions/set-outputs@main
       with:
         unity-cache-hit: ${{ steps.unity-cache.outputs.cache-hit }}
         nuget-cache-hit: ${{ steps.nuget-cache.outputs.cache-hit || 'false' }}
