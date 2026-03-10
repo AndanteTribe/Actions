@@ -1,0 +1,22 @@
+name: 'Set Cache Outputs'
+description: 'Write cache-hit outputs for Unity cache and NuGet cache to GITHUB_OUTPUT.'
+inputs:
+  unity-cache-hit:
+    description: 'Whether the Unity project cache was hit.'
+    required: true
+  nuget-cache-hit:
+    description: 'Whether the NuGet cache was hit.'
+    required: true
+outputs:
+  cache-hit-unity:
+    description: 'A boolean value indicating that the cache for the target Unity project has been found.'
+  cache-hit-nuget:
+    description: 'A boolean value indicating that the NuGet cache for the target Unity project has been found.'
+runs:
+  using: docker
+  image: Dockerfile
+  env:
+    UNITY_CACHE_HIT: ${{ inputs.unity-cache-hit }}
+    NUGET_CACHE_HIT: ${{ inputs.nuget-cache-hit }}
+  args:
+    - cache/SetOutputs.cs

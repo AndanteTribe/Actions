@@ -1,0 +1,16 @@
+name: 'Fetch Unity Project Info'
+description: 'Fetch Unity project name from project path and write to GITHUB_OUTPUT.'
+inputs:
+  unity-project-path:
+    description: 'A directory path for the Unity project.'
+    required: true
+outputs:
+  name:
+    description: 'The Unity project directory name.'
+runs:
+  using: docker
+  image: Dockerfile
+  env:
+    UNITY_PROJECT_PATH: ${{ inputs.unity-project-path }}
+  args:
+    - share/FetchUnityProjectInfo.cs
