@@ -1,14 +1,14 @@
-name: 'Unity Activate'
-description: 'Build and start a Unity editor Docker container with license activation.'
+name: 'Unity Container Setup'
+description: 'Build and start a Unity editor Docker container with the specified project mounted.'
 author: 'AndanteTribe'
 inputs:
   editor-image:
     description: 'The Unity editor Docker image to use (e.g., unityci/editor:6000.3.2f1-linux-il2cpp-3.2.1).'
     required: true
-  blank-project-path:
-    description: 'A host directory path to use as the blank Unity project for license activation.'
+  project-path:
+    description: 'Host path of the Unity project to mount into the container at /workspace.'
     required: false
-    default: '/tmp/BlankProject'
+    default: '${{ github.workspace }}'
   container-name:
     description: 'The name for the Unity Docker container.'
     required: false
@@ -16,28 +16,24 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Build Unity activation image
+    - name: Build Unity container image
       shell: bash
       run: |
         docker build \
           --build-arg UNITY_EDITOR_IMAGE="${{ inputs.editor-image }}" \
-          -t unity-activate-image \
+          -t unity-editor-image \
           "${{ github.action_path }}"
 
     - name: Start Unity container
       shell: bash
       env:
         CONTAINER_NAME: ${{ inputs.container-name }}
-        BLANK_PROJECT_PATH: ${{ inputs.blank-project-path }}
+        PROJECT_PATH: ${{ inputs.project-path }}
       run: |
         docker run -d \
           --name "$CONTAINER_NAME" \
-          -e UNITY_SERIAL \
-          -e UNITY_EMAIL \
-          -e UNITY_PASSWORD \
-          -v "${BLANK_PROJECT_PATH}:/BlankProject" \
-          -v "$GITHUB_WORKSPACE:/workspace" \
-          unity-activate-image
+          -v "${PROJECT_PATH}:/workspace" \
+          unity-editor-image
 
     - name: Verify Unity container started
       shell: bash
