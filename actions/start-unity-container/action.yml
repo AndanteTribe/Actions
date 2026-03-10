@@ -1,0 +1,74 @@
+name: 'Start Unity Container'
+description: 'Launch a Unity editor Docker container with license activation.'
+author: 'AndanteTribe'
+inputs:
+  unity-serial:
+    description: 'The Unity serial number for license activation.'
+    required: true
+  unity-email:
+    description: 'The Unity account email address for license activation.'
+    required: true
+  unity-password:
+    description: 'The Unity account password for license activation.'
+    required: true
+  unity-version:
+    description: 'The Unity editor version to use (e.g. 6000.3.2f1).'
+    required: true
+  target-platform:
+    description: 'The target build platform (e.g. linux-il2cpp, windows-mono).'
+    required: true
+  editor-version:
+    description: 'The GameCI Unity editor image version (e.g. 3.2.1).'
+    required: true
+  project-path:
+    description: 'The path to the Unity project to mount at /workspace inside the container.'
+    required: true
+  blank-project-path:
+    description: 'The path to use as a blank Unity project for license activation.'
+    required: false
+    default: '/tmp/BlankProject'
+  container-name:
+    description: 'The name to assign to the Docker container.'
+    required: false
+    default: 'unity-agent'
+outputs:
+  container-id:
+    description: 'The ID of the started Docker container.'
+    value: ${{ steps.start-container.outputs.container-id }}
+runs:
+  using: 'composite'
+  steps:
+    - name: Start Unity container
+      id: start-container
+      shell: bash
+      env:
+        UNITY_SERIAL: ${{ inputs.unity-serial }}
+        UNITY_EMAIL: ${{ inputs.unity-email }}
+        UNITY_PASSWORD: ${{ inputs.unity-password }}
+      run: |
+        mkdir -p "${{ inputs.blank-project-path }}/Assets"
+
+        CONTAINER_ID=$(docker run -d \
+          --name "${{ inputs.container-name }}" \
+          -e UNITY_SERIAL \
+          -e UNITY_EMAIL \
+          -e UNITY_PASSWORD \
+          -v "${{ inputs.blank-project-path }}:/BlankProject" \
+          -v "${{ inputs.project-path }}:/workspace" \
+          "unityci/editor:${{ inputs.unity-version }}-${{ inputs.target-platform }}-${{ inputs.editor-version }}" \
+          bash -c '
+            dbus-uuidgen > /etc/machine-id &&
+            mkdir -p /var/lib/dbus &&
+            ln -sf /etc/machine-id /var/lib/dbus/machine-id &&
+
+            unity-editor -batchmode -nographics -quit \
+              -serial "$UNITY_SERIAL" \
+              -username "$UNITY_EMAIL" \
+              -password "$UNITY_PASSWORD" \
+              -projectPath /BlankProject &&
+
+            # Keep the container alive so subsequent steps can exec into it
+            tail -f /dev/null
+          ')
+
+        echo "container-id=$CONTAINER_ID" >> "$GITHUB_OUTPUT"
