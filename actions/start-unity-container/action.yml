@@ -26,34 +26,15 @@ inputs:
 outputs:
   container-id:
     description: 'The ID of the started Docker container.'
-    value: ${{ steps.start-container.outputs.container-id }}
 runs:
-  using: 'composite'
-  steps:
-    - name: Build Unity container image
-      shell: bash
-      run: |
-        docker build \
-          --build-arg UNITY_IMAGE="unityci/editor:${{ inputs.unity-version }}-${{ inputs.target-platform }}-${{ inputs.editor-version }}" \
-          -t "unity-container-action:${{ inputs.unity-version }}-${{ inputs.target-platform }}-${{ inputs.editor-version }}" \
-          "$GITHUB_ACTION_PATH"
-
-    - name: Start Unity container
-      id: start-container
-      shell: bash
-      run: |
-        mkdir -p "${{ inputs.blank-project-path }}/Assets"
-
-        PROJECT_PATH="${{ inputs.unity-project-path }}"
-        [[ "$PROJECT_PATH" = /* ]] || PROJECT_PATH="$GITHUB_WORKSPACE/$PROJECT_PATH"
-
-        CONTAINER_ID=$(docker run -d \
-          --name "${{ inputs.container-name }}" \
-          -e UNITY_SERIAL \
-          -e UNITY_EMAIL \
-          -e UNITY_PASSWORD \
-          -v "${{ inputs.blank-project-path }}:/BlankProject" \
-          -v "$PROJECT_PATH:/workspace" \
-          "unity-container-action:${{ inputs.unity-version }}-${{ inputs.target-platform }}-${{ inputs.editor-version }}")
-
-        echo "container-id=$CONTAINER_ID" >> "$GITHUB_OUTPUT"
+  using: docker
+  image: Dockerfile
+  env:
+    UNITY_VERSION: ${{ inputs.unity-version }}
+    TARGET_PLATFORM: ${{ inputs.target-platform }}
+    EDITOR_VERSION: ${{ inputs.editor-version }}
+    UNITY_PROJECT_PATH: ${{ inputs.unity-project-path }}
+    BLANK_PROJECT_PATH: ${{ inputs.blank-project-path }}
+    CONTAINER_NAME: ${{ inputs.container-name }}
+  args:
+    - /app/StartUnityContainer.cs
