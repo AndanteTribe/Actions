@@ -1,0 +1,16 @@
+name: 'NuGetForUnity Restore'
+description: 'Runs NuGetForUnity restore for a Unity project.'
+inputs:
+  unity-project-path:
+    description: 'A directory path for the Unity project, relative to the workspace.'
+    required: true
+  nuget-packages-path:
+    description: 'A directory path where NuGetForUnity downloads packages, relative to the workspace.'
+    required: false
+runs:
+  using: docker
+  image: Dockerfile
+  env:
+    NUGET_PACKAGES: /github/workspace/${{ inputs.nuget-packages-path }}
+  args:
+    - /github/workspace/${{ inputs.unity-project-path }}

@@ -1,0 +1,19 @@
+name: 'Set Outputs'
+description: 'Sets the cache-hit outputs for the unity-cache action.'
+inputs:
+  unity-cache-hit:
+    description: 'Whether the Unity cache was hit.'
+    required: false
+    default: 'false'
+  nuget-cache-hit:
+    description: 'Whether the NuGet cache was hit.'
+    required: false
+    default: 'false'
+runs:
+  using: docker
+  image: Dockerfile
+  env:
+    UNITY_CACHE_HIT: ${{ inputs.unity-cache-hit }}
+    NUGET_CACHE_HIT: ${{ inputs.nuget-cache-hit }}
+  args:
+    - cache/SetOutputs.cs
