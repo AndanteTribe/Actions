@@ -7,10 +7,15 @@ inputs:
 outputs:
   name:
     description: 'The Unity project directory name.'
+    value: ${{ steps.fetch.outputs.name }}
 runs:
-  using: docker
-  image: Dockerfile
-  env:
-    UNITY_PROJECT_PATH: ${{ inputs.unity-project-path }}
-  args:
-    - /app/FetchUnityProjectInfo.cs
+  using: composite
+  steps:
+    - name: Fetch project name
+      id: fetch
+      shell: bash
+      env:
+        UNITY_PROJECT_PATH: ${{ inputs.unity-project-path }}
+      run: |
+        name=$(basename "$UNITY_PROJECT_PATH")
+        echo "name=$name" >> "$GITHUB_OUTPUT"
