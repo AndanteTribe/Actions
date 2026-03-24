@@ -33,11 +33,28 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - name: Check if .NET 10 is installed
+      id: check-dotnet
+      shell: bash
+      run: |
+        if dotnet --list-sdks 2>/dev/null | grep -q "^10\."; then
+          echo "installed=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "installed=false" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: Setup .NET 10
+      if: ${{ steps.check-dotnet.outputs.installed != 'true' }}
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.x'
+
     - name: Fetch unity project info
       id: info
-      uses: AndanteTribe/Actions/actions/fetch-unity-info@main
-      with:
-        unity-project-path: ${{ inputs.unity-project-path }}
+      shell: bash
+      env:
+        UNITY_PROJECT_PATH: ${{ inputs.unity-project-path }}
+      run: dotnet run -c Release "${{ github.action_path }}/../fetch-unity-info/FetchUnityProjectInfo.cs"
 
     - name: Restore nuget cache
       if: ${{ inputs.use-nugetforunity == 'true' && !contains(runner.labels, 'self-hosted') }}
@@ -70,7 +87,8 @@ runs:
 
     - name: Set outputs
       id: set-outputs
-      uses: AndanteTribe/Actions/actions/set-outputs@main
-      with:
-        unity-cache-hit: ${{ steps.unity-cache.outputs.cache-hit }}
-        nuget-cache-hit: ${{ steps.nuget-cache.outputs.cache-hit || 'false' }}
+      shell: bash
+      env:
+        UNITY_CACHE_HIT: ${{ steps.unity-cache.outputs.cache-hit }}
+        NUGET_CACHE_HIT: ${{ steps.nuget-cache.outputs.cache-hit || 'false' }}
+      run: dotnet run -c Release "${{ github.action_path }}/../set-outputs/SetOutputs.cs"
