@@ -1,0 +1,144 @@
+name: 'Update TMP Font Asset'
+description: 'Update TextMeshPro FontAsset files by adding characters using Unity batch mode.'
+author: 'AndanteTribe'
+inputs:
+  font-asset-paths:
+    description: 'Comma-separated paths to TMP FontAsset files, relative to the workspace root.'
+    required: true
+  characters:
+    description: 'Characters to add to the font assets.'
+    required: true
+  include-font-features:
+    description: 'Whether to include font features when adding characters.'
+    required: false
+    default: 'false'
+  unity-version:
+    description: 'Unity version to use. Defaults to auto-detection from ProjectSettings/ProjectVersion.txt.'
+    required: false
+    default: 'auto'
+  target-platform:
+    description: 'Build target platform passed to game-ci/unity-builder.'
+    required: false
+    default: 'StandaloneLinux64'
+  unity-license:
+    description: 'Contents of the Unity license file (for Personal license activation).'
+    required: false
+  unity-email:
+    description: 'Email address used to activate the Unity license.'
+    required: false
+  unity-password:
+    description: 'Password used to activate the Unity license.'
+    required: false
+  unity-serial:
+    description: 'Serial number used to activate a Unity Plus or Pro license.'
+    required: false
+outputs:
+  result:
+    description: 'Whether all characters were successfully added (true or false).'
+    value: ${{ steps.parse-output.outputs.result }}
+  missing-characters:
+    description: 'Characters that could not be added to any of the font assets.'
+    value: ${{ steps.parse-output.outputs.missing-characters }}
+runs:
+  using: 'composite'
+  steps:
+    - name: Prepare Unity project and font assets
+      id: prepare
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        # Copy the FontAssetUpdater utility project into the workspace so that
+        # game-ci/unity-builder (which mounts $GITHUB_WORKSPACE) can find it.
+        PROJECT_DEST="$GITHUB_WORKSPACE/.font-asset-updater"
+        cp -r "${{ github.action_path }}/FontAssetUpdater.Unity" "$PROJECT_DEST"
+
+        # Create the staging directory for font assets inside the Unity project.
+        ASSETS_DEST="$PROJECT_DEST/Assets/FontAssets"
+        mkdir -p "$ASSETS_DEST"
+
+        # Write the font-asset path list (one internal path per line) to a temp
+        # file so that characters with spaces or commas are handled correctly.
+        PATHS_FILE="$GITHUB_WORKSPACE/.font-asset-paths"
+        > "$PATHS_FILE"
+
+        IFS=',' read -ra FONT_PATHS <<< "${{ inputs.font-asset-paths }}"
+        for font_path in "${FONT_PATHS[@]}"; do
+          # Trim leading/trailing whitespace.
+          trimmed="${font_path#"${font_path%%[![:space:]]*}"}"
+          trimmed="${trimmed%"${trimmed##*[![:space:]]}"}"
+
+          filename=$(basename "$trimmed")
+          cp "$GITHUB_WORKSPACE/$trimmed" "$ASSETS_DEST/$filename"
+
+          # Copy .meta file if present so Unity does not regenerate GUIDs.
+          if [ -f "$GITHUB_WORKSPACE/${trimmed}.meta" ]; then
+            cp "$GITHUB_WORKSPACE/${trimmed}.meta" "$ASSETS_DEST/${filename}.meta"
+          fi
+
+          echo "Assets/FontAssets/$filename" >> "$PATHS_FILE"
+        done
+
+        # Write the characters string to a separate file to avoid any shell
+        # quoting issues when passing to Unity via customParameters.
+        printf '%s' "${{ inputs.characters }}" > "$GITHUB_WORKSPACE/.font-asset-characters"
+
+    - name: Run Unity to update font assets
+      uses: game-ci/unity-builder@v4
+      env:
+        UNITY_LICENSE: ${{ inputs.unity-license }}
+        UNITY_EMAIL: ${{ inputs.unity-email }}
+        UNITY_PASSWORD: ${{ inputs.unity-password }}
+        UNITY_SERIAL: ${{ inputs.unity-serial }}
+      with:
+        projectPath: .font-asset-updater
+        unityVersion: ${{ inputs.unity-version }}
+        targetPlatform: ${{ inputs.target-platform }}
+        buildMethod: AndanteTribe.TextMeshPro.Editor.FontAssetUpdater.InsertCharacters
+        versioning: None
+        customParameters: >-
+          -fontAssetPathsFile /github/workspace/.font-asset-paths
+          -charactersFile /github/workspace/.font-asset-characters
+          -includeFontFeatures ${{ inputs.include-font-features }}
+          -outputPath /github/workspace/.font-asset-output
+
+    - name: Copy modified font assets back to original locations
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        ASSETS_SRC="$GITHUB_WORKSPACE/.font-asset-updater/Assets/FontAssets"
+
+        IFS=',' read -ra FONT_PATHS <<< "${{ inputs.font-asset-paths }}"
+        for font_path in "${FONT_PATHS[@]}"; do
+          trimmed="${font_path#"${font_path%%[![:space:]]*}"}"
+          trimmed="${trimmed%"${trimmed##*[![:space:]]}"}"
+
+          filename=$(basename "$trimmed")
+          cp "$ASSETS_SRC/$filename" "$GITHUB_WORKSPACE/$trimmed"
+        done
+
+    - name: Parse Unity output
+      id: parse-output
+      shell: bash
+      run: |
+        OUTPUT_FILE="$GITHUB_WORKSPACE/.font-asset-output"
+        if [ -f "$OUTPUT_FILE" ]; then
+          while IFS= read -r line; do
+            key="${line%%=*}"
+            value="${line#*=}"
+            echo "$key=$value" >> "$GITHUB_OUTPUT"
+          done < "$OUTPUT_FILE"
+        else
+          echo "result=false" >> "$GITHUB_OUTPUT"
+          echo "missing-characters=" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: Clean up temporary files
+      if: always()
+      shell: bash
+      run: |
+        rm -rf "$GITHUB_WORKSPACE/.font-asset-updater"
+        rm -f "$GITHUB_WORKSPACE/.font-asset-paths"
+        rm -f "$GITHUB_WORKSPACE/.font-asset-characters"
+        rm -f "$GITHUB_WORKSPACE/.font-asset-output"

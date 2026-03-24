@@ -1,3 +1,6 @@
+# Font assets copied at CI runtime – should not be committed.
+/[Aa]ssets/FontAssets/
+
 # This .gitignore file should be placed at the root of your Unity project directory
 #
 # Get latest from https://github.com/github/gitignore/blob/main/Unity.gitignore
