@@ -10,19 +10,13 @@ inputs:
 outputs:
   cache-hit-unity:
     description: 'A boolean value indicating that the cache for the target Unity project has been found.'
-    value: ${{ steps.set.outputs.cache-hit-unity }}
   cache-hit-nuget:
     description: 'A boolean value indicating that the NuGet cache for the target Unity project has been found.'
-    value: ${{ steps.set.outputs.cache-hit-nuget }}
 runs:
-  using: composite
-  steps:
-    - name: Set outputs
-      id: set
-      shell: bash
-      env:
-        UNITY_CACHE_HIT: ${{ inputs.unity-cache-hit }}
-        NUGET_CACHE_HIT: ${{ inputs.nuget-cache-hit }}
-      run: |
-        echo "cache-hit-unity=$UNITY_CACHE_HIT" >> "$GITHUB_OUTPUT"
-        echo "cache-hit-nuget=$NUGET_CACHE_HIT" >> "$GITHUB_OUTPUT"
+  using: docker
+  image: Dockerfile
+  env:
+    UNITY_CACHE_HIT: ${{ inputs.unity-cache-hit }}
+    NUGET_CACHE_HIT: ${{ inputs.nuget-cache-hit }}
+  args:
+    - /app/SetOutputs.cs
