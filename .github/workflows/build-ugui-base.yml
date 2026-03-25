@@ -8,11 +8,15 @@ on:
       - 'src/UGUIBase.Unity/Assets/**'
       - 'src/UGUIBase.Unity/Packages/**'
       - 'src/UGUIBase.Unity/ProjectSettings/**'
+      - 'src/UGUIBase.Unity/Dockerfile'
+      - '.github/workflows/build-ugui-base.yml'
   pull_request:
     paths:
       - 'src/UGUIBase.Unity/Assets/**'
       - 'src/UGUIBase.Unity/Packages/**'
       - 'src/UGUIBase.Unity/ProjectSettings/**'
+      - 'src/UGUIBase.Unity/Dockerfile'
+      - '.github/workflows/build-ugui-base.yml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
