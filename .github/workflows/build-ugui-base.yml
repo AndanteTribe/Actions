@@ -45,7 +45,6 @@ jobs:
           unityVersion: auto
           targetPlatform: StandaloneLinux64
           buildMethod: CacheWarmer.WarmCache
-          allowDirtyBuild: true
 
       - name: Login to GitHub Container Registry
         if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
