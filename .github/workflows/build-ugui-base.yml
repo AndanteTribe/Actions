@@ -41,18 +41,17 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Build Docker image
+        run: |
+          docker build \
+            --build-arg UNITY_VERSION=${{ steps.unity-version.outputs.version }} \
+            -t ghcr.io/${{ github.repository_owner }}/ugui-base:latest \
+            -t ghcr.io/${{ github.repository_owner }}/ugui-base:${{ steps.unity-version.outputs.version }} \
+            src/UGUIBase.Unity
 
-      - name: Build and push
-        uses: docker/build-push-action@v6
-        with:
-          context: src/UGUIBase.Unity
-          push: ${{ github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
-          build-args: |
-            UNITY_VERSION=${{ steps.unity-version.outputs.version }}
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/ugui-base:latest
-            ghcr.io/${{ github.repository_owner }}/ugui-base:${{ steps.unity-version.outputs.version }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+      - name: Push Docker image
+        if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+        run: |
+          docker push ghcr.io/${{ github.repository_owner }}/ugui-base:latest
+          docker push ghcr.io/${{ github.repository_owner }}/ugui-base:${{ steps.unity-version.outputs.version }}
+
