@@ -26,10 +26,10 @@ inputs:
 outputs:
   cache-hit-unity:
     description: 'A boolean value indicating that the cache for the target Unity project has been found.'
-    value: ${{ steps.set-outputs.outputs.cache-hit-unity }}
+    value: ${{ steps.unity-cache.outputs.cache-hit }}
   cache-hit-nuget:
     description: 'A boolean value indicating that the NuGet cache for the target Unity project has been found.'
-    value: ${{ steps.set-outputs.outputs.cache-hit-nuget }}
+    value: ${{ steps.nuget-cache.outputs.cache-hit || 'false' }}
 runs:
   using: "composite"
   steps:
@@ -67,10 +67,3 @@ runs:
         upload-chunk-size: ${{ inputs.upload-chunk-size }}
         fail-on-cache-miss: ${{ inputs.fail-on-cache-miss }}
         lookup-only: ${{ inputs.lookup-only }}
-
-    - name: Set outputs
-      id: set-outputs
-      uses: AndanteTribe/Actions/actions/set-outputs@main
-      with:
-        unity-cache-hit: ${{ steps.unity-cache.outputs.cache-hit }}
-        nuget-cache-hit: ${{ steps.nuget-cache.outputs.cache-hit || 'false' }}
