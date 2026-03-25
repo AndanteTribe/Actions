@@ -34,15 +34,6 @@ jobs:
           echo "version=${version}" >> $GITHUB_OUTPUT
           echo "owner=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
 
-      - name: Cache Unity Library
-        uses: actions/cache@v4
-        with:
-          path: src/UGUIBase.Unity/Library
-          key: Library-${{ steps.unity-version.outputs.version }}-${{ hashFiles('src/UGUIBase.Unity/Assets/**', 'src/UGUIBase.Unity/Packages/**', 'src/UGUIBase.Unity/ProjectSettings/**') }}
-          restore-keys: |
-            Library-${{ steps.unity-version.outputs.version }}-
-            Library-
-
       - name: Generate Unity Library cache
         uses: game-ci/unity-builder@v4
         env:
