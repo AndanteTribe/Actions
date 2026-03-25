@@ -1,0 +1,137 @@
+name: 'Update TMP Font Asset'
+description: 'Updates TextMeshPro FontAsset registered characters by calling TMP_FontAsset.TryAddCharacters.'
+author: 'AndanteTribe'
+inputs:
+  font-asset-paths:
+    description: 'Newline-separated paths to TMP FontAsset files (.asset), relative to the repository root.'
+    required: true
+  characters:
+    description: 'Characters to add to the font assets.'
+    required: true
+  include-font-features:
+    description: 'Whether to include font features when adding characters.'
+    default: 'false'
+    required: false
+  unity-version:
+    description: 'Unity version to use. Defaults to auto-detect from ProjectVersion.txt.'
+    default: 'auto'
+    required: false
+  unity-license:
+    description: 'Unity license XML content (UNITY_LICENSE).'
+    required: true
+  unity-email:
+    description: 'Unity account email address (UNITY_EMAIL).'
+    required: true
+  unity-password:
+    description: 'Unity account password (UNITY_PASSWORD).'
+    required: true
+  custom-image:
+    description: 'Custom Docker image for the Unity builder (e.g., ghcr.io/owner/ugui-base:latest). Uses the pre-built uGUI base image for faster execution.'
+    required: false
+outputs:
+  result:
+    description: 'Whether all font assets were updated successfully (true or false).'
+    value: ${{ steps.read-result.outputs.result }}
+  missing-characters:
+    description: 'Characters that could not be added to the font assets.'
+    value: ${{ steps.read-result.outputs.missing-characters }}
+runs:
+  using: 'composite'
+  steps:
+    - name: Prepare Unity project
+      shell: bash
+      run: |
+        cp -r "${{ github.action_path }}/../../src/UGUIBase.Unity" "${{ github.workspace }}/_TmpFontUpdaterProject"
+        mkdir -p "${{ github.workspace }}/_TmpFontUpdaterProject/Assets/TmpFontUpdater"
+
+    - name: Copy font assets into project
+      shell: bash
+      env:
+        FONT_ASSET_PATHS: ${{ inputs.font-asset-paths }}
+      run: |
+        PROJECT_ASSETS="${{ github.workspace }}/_TmpFontUpdaterProject/Assets/TmpFontUpdater"
+        while IFS= read -r line || [ -n "$line" ]; do
+          path=$(echo "$line" | xargs)
+          [ -z "$path" ] && continue
+          src="${{ github.workspace }}/${path}"
+          filename=$(basename "$path")
+          cp "$src" "$PROJECT_ASSETS/$filename"
+          [ -f "${src}.meta" ] && cp "${src}.meta" "$PROJECT_ASSETS/${filename}.meta"
+        done <<< "$FONT_ASSET_PATHS"
+
+    - name: Write params file
+      shell: bash
+      env:
+        FONT_ASSET_PATHS: ${{ inputs.font-asset-paths }}
+        CHARACTERS: ${{ inputs.characters }}
+      run: |
+        PROJECT_ROOT="${{ github.workspace }}/_TmpFontUpdaterProject"
+
+        PATHS_ARG=""
+        while IFS= read -r line || [ -n "$line" ]; do
+          path=$(echo "$line" | xargs)
+          [ -z "$path" ] && continue
+          filename=$(basename "$path")
+          asset_path="Assets/TmpFontUpdater/${filename}"
+          if [ -z "$PATHS_ARG" ]; then
+            PATHS_ARG="$asset_path"
+          else
+            PATHS_ARG="${PATHS_ARG}|${asset_path}"
+          fi
+        done <<< "$FONT_ASSET_PATHS"
+
+        CHARS_B64=$(printf '%s' "$CHARACTERS" | base64 | tr -d '\n')
+
+        {
+          echo "fontAssetPaths=${PATHS_ARG}"
+          echo "characters=${CHARS_B64}"
+          echo "includeFontFeatures=${{ inputs.include-font-features }}"
+        } > "${PROJECT_ROOT}/tmp-font-update-params.txt"
+
+    - name: Run FontAsset updater
+      uses: game-ci/unity-builder@v4
+      env:
+        UNITY_EMAIL: ${{ inputs.unity-email }}
+        UNITY_PASSWORD: ${{ inputs.unity-password }}
+        UNITY_LICENSE: ${{ inputs.unity-license }}
+      with:
+        projectPath: _TmpFontUpdaterProject
+        unityVersion: ${{ inputs.unity-version }}
+        targetPlatform: StandaloneLinux64
+        buildMethod: AndanteTribe.TextMeshPro.Editor.FontAssetUpdater.InsertCharacters
+        customImage: ${{ inputs.custom-image }}
+        allowDirtyBuild: true
+
+    - name: Read result and set outputs
+      id: read-result
+      shell: bash
+      run: |
+        RESULT_FILE="${{ github.workspace }}/_TmpFontUpdaterProject/tmp-font-asset-result.txt"
+        if [ -f "$RESULT_FILE" ]; then
+          result=$(sed -n 's/^result=//p' "$RESULT_FILE")
+          missing=$(sed -n 's/^missingCharacters=//p' "$RESULT_FILE")
+          echo "result=${result}" >> "$GITHUB_OUTPUT"
+          echo "missing-characters=${missing}" >> "$GITHUB_OUTPUT"
+        else
+          echo "result=false" >> "$GITHUB_OUTPUT"
+          echo "missing-characters=" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: Copy modified assets back
+      shell: bash
+      env:
+        FONT_ASSET_PATHS: ${{ inputs.font-asset-paths }}
+      run: |
+        PROJECT_ASSETS="${{ github.workspace }}/_TmpFontUpdaterProject/Assets/TmpFontUpdater"
+        while IFS= read -r line || [ -n "$line" ]; do
+          path=$(echo "$line" | xargs)
+          [ -z "$path" ] && continue
+          dst="${{ github.workspace }}/${path}"
+          filename=$(basename "$path")
+          cp "$PROJECT_ASSETS/$filename" "$dst"
+        done <<< "$FONT_ASSET_PATHS"
+
+    - name: Cleanup
+      if: always()
+      shell: bash
+      run: rm -rf "${{ github.workspace }}/_TmpFontUpdaterProject"
