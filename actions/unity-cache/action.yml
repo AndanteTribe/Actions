@@ -23,13 +23,18 @@ inputs:
   nuget-packages-path:
     description: 'A directory path where NuGetForUnity downloads packages. Used when use-nugetforunity is true.'
     required: false
+  local-cashe-path:
+    description: 'A directory path to store cache locally on self-hosted runners.'
+    default: 'cache'
+    required: false
+
 outputs:
   cache-hit-unity:
     description: 'A boolean value indicating that the cache for the target Unity project has been found.'
-    value: ${{ steps.unity-cache.outputs.cache-hit }}
+    value: ${{ steps.unity-cache.outputs.cache-hit == 'true' || steps.unity-cache-local.outputs.cache-hit == 'true' }}
   cache-hit-nuget:
     description: 'A boolean value indicating that the NuGet cache for the target Unity project has been found.'
-    value: ${{ steps.nuget-cache.outputs.cache-hit || 'false' }}
+    value: ${{ steps.nuget-cache.outputs.cache-hit == 'true' || steps.nuget-cache-local.outputs.cache-hit == 'true' }}
 runs:
   using: "composite"
   steps:
@@ -39,7 +44,31 @@ runs:
       with:
         unity-project-path: ${{ inputs.unity-project-path }}
 
-    - name: Restore nuget cache
+    - name: Setup local cache Directory
+      if: ${{ contains(runner.labels, 'self-hosted') }}
+      shell: bash
+      run: |
+        mkdir -p "${{ inputs.local-cashe-path }}"
+        echo "*" > "${{ inputs.local-cashe-path }}/.gitignore"
+
+    - name: Restore nuget cache (Local)
+      if: ${{ inputs.use-nugetforunity == 'true' && !contains(runner.labels, 'self-hosted') }}
+      id: nuget-cache-local
+      shell: bash
+      run: |
+          CACHE_DIR="${{ inputs.local-cache-path }}/nuget-${{ steps.info.outputs.name }}"
+          TARGET_DIR="${{ inputs.nuget-packages-path }}"
+          if [ -d "$CACHE_DIR" ] && [ "$(ls -A "$CACHE_DIR")" ]; then
+            echo "Local Unity cache found."
+            echo "cache-hit=true" >> $GITHUB_OUTPUT
+            mkdir -p "$TARGET_DIR"
+            cp -a "$CACHE_DIR/." "$TARGET_DIR/"
+          else
+            echo "Local Unity cache not found."
+            echo "cache-hit=false" >> $GITHUB_OUTPUT
+          fi
+
+    - name: Restore nuget cache (Cloud)
       if: ${{ inputs.use-nugetforunity == 'true' && !contains(runner.labels, 'self-hosted') }}
       id: nuget-cache
       uses: actions/cache@v4
@@ -51,13 +80,13 @@ runs:
         lookup-only: ${{ inputs.lookup-only }}
 
     - name: Run NuGetForUnity restore
-      if: ${{ inputs.use-nugetforunity == 'true' && steps.nuget-cache.outputs.cache-hit != 'true' }}
+      if: ${{ inputs.use-nugetforunity == 'true' && steps.nuget-cache.outputs.cache-hit != 'true' && steps.nuget-cache-local.outputs.cache-hit != 'true'}}
       uses: AndanteTribe/Actions/actions/nugetforunity-restore@main
       with:
         unity-project-path: ${{ inputs.unity-project-path }}
         nuget-packages-path: ${{ inputs.nuget-packages-path }}
 
-    - name: Restore unity project cache
+    - name: Restore unity project cache (Cloud)
       if: ${{ !contains(runner.labels, 'self-hosted') }}
       id: unity-cache
       uses: actions/cache@v4
@@ -67,3 +96,29 @@ runs:
         upload-chunk-size: ${{ inputs.upload-chunk-size }}
         fail-on-cache-miss: ${{ inputs.fail-on-cache-miss }}
         lookup-only: ${{ inputs.lookup-only }}
+
+    - name: Restore unity project cache (Local)
+      if: ${{ contains(runner.labels, 'self-hosted') }}
+      id: unity-cache-local
+      shell: bash
+      run: |
+          CACHE_DIR="${{ inputs.local-cache-path }}/unity-${{ steps.info.outputs.name }}"
+          TARGET_DIR="${{ inputs.unity-project-path }}/Library"
+          if [ -d "$CACHE_DIR" ] && [ "$(ls -A "$CACHE_DIR")" ]; then
+            echo "Local Unity cache found."
+            echo "cache-hit=true" >> $GITHUB_OUTPUT
+            mkdir -p "$TARGET_DIR"
+            cp -a "$CACHE_DIR/." "$TARGET_DIR/"
+          else
+            echo "Local Unity cache not found."
+            echo "cache-hit=false" >> $GITHUB_OUTPUT
+          fi
+
+    - name: Save local unity project cache
+      if: ${{ contains(runner.labels, 'self-hosted') && always()}}
+      shell: bash
+      run: |
+          CACHE_DIR="cache/unity-${{ steps.info.outputs.name }}"
+          TARGET_DIR="${{ inputs.unity-project-path }}/Library"
+          mkdir -p "$CACHE_DIR"
+          cp -a "$TARGET_DIR/." "$CACHE_DIR/"
