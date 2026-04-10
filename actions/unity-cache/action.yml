@@ -38,19 +38,19 @@ outputs:
 runs:
   using: "composite"
   steps:
-#    - name: Fetch unity project info
-#      id: info
-#      uses: AndanteTribe/Actions/actions/fetch-unity-info@main
-#      with:
-#        unity-project-path: ${{ inputs.unity-project-path }}
-
-    - name: Fetch unity project info (Fallback)
+    - name: Fetch unity project info
       id: info
-      shell: bash
-      run: |
-        # Unityのバージョンファイルとパッケージリストのハッシュを組み合わせて一意のキーを作る
-        CACHE_KEY="${{ runner.os }}-${{ hashFiles(format('{0}/ProjectSettings/ProjectVersion.txt', inputs.unity-project-path), format('{0}/Packages/manifest.json', inputs.unity-project-path)) }}"
-            echo "name=${CACHE_KEY}" >> $GITHUB_OUTPUT
+      uses: AndanteTribe/Actions/actions/fetch-unity-info@main
+      with:
+        unity-project-path: ${{ inputs.unity-project-path }}
+
+#    - name: Fetch unity project info (Fallback)
+#      id: info
+#      shell: bash
+#      run: |
+#        # Unityのバージョンファイルとパッケージリストのハッシュを組み合わせて一意のキーを作る
+#        CACHE_KEY="${{ runner.os }}-${{ hashFiles(format('{0}/ProjectSettings/ProjectVersion.txt', inputs.unity-project-path), format('{0}/Packages/manifest.json', inputs.unity-project-path)) }}"
+#            echo "name=${CACHE_KEY}" >> $GITHUB_OUTPUT
 
     - name: Setup local cache Directory
       if: ${{ contains(runner.labels, 'self-hosted') }}
