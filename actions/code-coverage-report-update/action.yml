@@ -1,0 +1,12 @@
+name: 'Update Unity Test Code Coverage Report'
+description: 'Update Unity test code coverage report to GitHub.'
+inputs:
+    coverage-report-path:
+        description: 'Root directory containing Summary.md files'
+        required: false
+        default: 'CodeCoverage'
+runs:
+    using: docker
+    image: Dockerfile
+    args:
+        - /app/CodeCoverageReportUpdate.cs
