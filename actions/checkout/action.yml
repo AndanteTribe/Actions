@@ -1,0 +1,102 @@
+name: 'Checkout'
+description: 'Checkout a Git repository at a particular version'
+author: 'AndanteTribe'
+inputs:
+  repository:
+    description: 'Repository name with owner. For example, actions/checkout'
+    default: ${{ github.repository }}
+  ref:
+    description: >
+      The branch, tag or SHA to checkout. When checking out the repository that
+      triggered a workflow, this defaults to the reference or SHA for that
+      event. Otherwise, uses the default branch.
+  token:
+    description: >
+      Personal access token (PAT) used to fetch the repository. The PAT is configured
+      with the local git config, which enables your scripts to run authenticated git
+      commands. The post-job step removes the PAT.
+    default: ${{ github.token }}
+  ssh-key:
+    description: 'SSH key used to fetch the repository.'
+  ssh-known-hosts:
+    description: 'Known hosts in addition to the user and global host key database.'
+  ssh-strict:
+    description: 'Whether to perform strict host key checking.'
+    default: 'true'
+  ssh-user:
+    description: 'The user to use when connecting to the remote SSH host.'
+    default: git
+  persist-credentials:
+    description: 'Whether to configure the token or SSH key with the local git config'
+    default: 'true'
+  path:
+    description: 'Relative path under $GITHUB_WORKSPACE to place the repository'
+  clean:
+    description: 'Whether to execute `git clean -ffdx && git reset --hard HEAD` before fetching'
+    default: 'true'
+  filter:
+    description: 'Partially clone against a given filter. Overrides sparse-checkout if set.'
+    default: ''
+  sparse-checkout:
+    description: 'Do a sparse checkout on given patterns. Each pattern should be separated with new lines.'
+    default: ''
+  sparse-checkout-cone-mode:
+    description: 'Specifies whether to use cone-mode when doing a sparse checkout.'
+    default: 'true'
+  fetch-depth:
+    description: 'Number of commits to fetch. 0 indicates all history for all branches and tags.'
+    default: '1'
+  fetch-tags:
+    description: 'Whether to fetch tags, even if fetch-depth > 0.'
+    default: 'false'
+  show-progress:
+    description: 'Whether to show progress status output when fetching.'
+    default: 'true'
+  lfs:
+    description: 'Whether to download Git-LFS files'
+    default: 'false'
+  submodules:
+    description: >
+      Whether to checkout submodules: `true` to checkout submodules or `recursive` to
+      recursively checkout submodules.
+    default: 'false'
+  set-safe-directory:
+    description: 'Add repository path as safe.directory for Git global config'
+    default: 'true'
+  github-server-url:
+    description: 'The base URL for the GitHub instance that you are trying to clone from.'
+    required: false
+outputs:
+  ref:
+    description: 'The branch, tag or SHA that was checked out'
+    value: ${{ steps.checkout.outputs.ref }}
+  commit:
+    description: 'The commit SHA that was checked out'
+    value: ${{ steps.checkout.outputs.commit }}
+runs:
+  using: 'composite'
+  steps:
+    # see: https://github.com/actions/checkout
+    - id: checkout
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      with:
+        repository: ${{ inputs.repository }}
+        ref: ${{ inputs.ref }}
+        token: ${{ inputs.token }}
+        ssh-key: ${{ inputs.ssh-key }}
+        ssh-known-hosts: ${{ inputs.ssh-known-hosts }}
+        ssh-strict: ${{ inputs.ssh-strict }}
+        ssh-user: ${{ inputs.ssh-user }}
+        persist-credentials: ${{ inputs.persist-credentials }}
+        path: ${{ inputs.path }}
+        clean: ${{ inputs.clean }}
+        filter: ${{ inputs.filter != '' && inputs.filter || null }}
+        sparse-checkout: ${{ inputs.sparse-checkout != '' && inputs.sparse-checkout || null }}
+        sparse-checkout-cone-mode: ${{ inputs.sparse-checkout-cone-mode }}
+        fetch-depth: ${{ inputs.fetch-depth }}
+        fetch-tags: ${{ inputs.fetch-tags }}
+        show-progress: ${{ inputs.show-progress }}
+        lfs: ${{ inputs.lfs }}
+        submodules: ${{ inputs.submodules }}
+        set-safe-directory: ${{ inputs.set-safe-directory }}
+        github-server-url: ${{ inputs.github-server-url }}

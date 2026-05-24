@@ -9,7 +9,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: AndanteTribe/Actions/actions/checkout@main
       with:
         fetch-depth: 0
     - name: Set Branch Name
