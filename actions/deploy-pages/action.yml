@@ -1,0 +1,45 @@
+name: 'Deploy GitHub Pages Site'
+description: 'A GitHub Action to deploy an artifact as a GitHub Pages site'
+author: 'AndanteTribe'
+inputs:
+  token:
+    description: 'GitHub token'
+    default: ${{ github.token }}
+    required: true
+  timeout:
+    description: 'Time in milliseconds after which to timeout and cancel the deployment (default: 10 minutes)'
+    required: false
+    default: '600000'
+  error_count:
+    description: 'Maximum number of status report errors before cancelling a deployment (default: 10)'
+    required: false
+    default: '10'
+  reporting_interval:
+    description: 'Time in milliseconds between two deployment status reports (default: 5 seconds)'
+    required: false
+    default: '5000'
+  artifact_name:
+    description: 'Name of the artifact to deploy'
+    required: false
+    default: 'github-pages'
+  preview:
+    description: 'Is this attempting to deploy a pull request as a GitHub Pages preview site?'
+    required: false
+    default: 'false'
+outputs:
+  page_url:
+    description: 'URL to deployed GitHub Pages'
+    value: ${{ steps.deploy-pages.outputs.page_url }}
+runs:
+  using: 'composite'
+  steps:
+    # see: https://github.com/actions/deploy-pages
+    - id: deploy-pages
+      uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
+      with:
+        token: ${{ inputs.token }}
+        timeout: ${{ inputs.timeout }}
+        error_count: ${{ inputs.error_count }}
+        reporting_interval: ${{ inputs.reporting_interval }}
+        artifact_name: ${{ inputs.artifact_name }}
+        preview: ${{ inputs.preview }}

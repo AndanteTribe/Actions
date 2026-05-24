@@ -9,11 +9,16 @@ Marketplace actions are wrapped here so version management is consolidated in th
 
 | Action | Description | Wraps |
 |--------|-------------|-------|
-| [`actions/checkout`](./actions/checkout) | Checkout a Git repository | [`actions/checkout`](https://github.com/actions/checkout) |
-| [`actions/setup-dotnet`](./actions/setup-dotnet) | Set up a .NET SDK | [`actions/setup-dotnet`](https://github.com/actions/setup-dotnet) |
-| [`actions/upload-artifact`](./actions/upload-artifact) | Upload a build artifact | [`actions/upload-artifact`](https://github.com/actions/upload-artifact) |
-| [`actions/unity-meta-check`](./actions/unity-meta-check) | Check missing/dangling Unity meta files | [`DeNA/unity-meta-check`](https://github.com/DeNA/unity-meta-check) |
-| [`actions/unity-test-runner`](./actions/unity-test-runner) | Run tests for a Unity project | [`game-ci/unity-test-runner`](https://github.com/game-ci/unity-test-runner) |
+| [`actions/checkout`](./actions/checkout) | Checkout a Git repository | [`actions/checkout`](https://github.com/actions/checkout) v6.0.2 |
+| [`actions/configure-pages`](./actions/configure-pages) | Configure GitHub Pages | [`actions/configure-pages`](https://github.com/actions/configure-pages) v6.0.0 |
+| [`actions/create-github-app-token`](./actions/create-github-app-token) | Create a GitHub App installation access token | [`actions/create-github-app-token`](https://github.com/actions/create-github-app-token) v3.2.0 |
+| [`actions/create-unitypackage`](./actions/create-unitypackage) | Create a .unitypackage file | [`pCYSl5EDgo/create-unitypackage`](https://github.com/pCYSl5EDgo/create-unitypackage) v1.2.3 |
+| [`actions/deploy-pages`](./actions/deploy-pages) | Deploy an artifact as a GitHub Pages site | [`actions/deploy-pages`](https://github.com/actions/deploy-pages) v5.0.0 |
+| [`actions/setup-dotnet`](./actions/setup-dotnet) | Set up a .NET SDK | [`actions/setup-dotnet`](https://github.com/actions/setup-dotnet) v5.2.0 |
+| [`actions/unity-meta-check`](./actions/unity-meta-check) | Check missing/dangling Unity meta files | [`DeNA/unity-meta-check`](https://github.com/DeNA/unity-meta-check) v4.0.0 |
+| [`actions/unity-test-runner`](./actions/unity-test-runner) | Run tests for a Unity project | [`game-ci/unity-test-runner`](https://github.com/game-ci/unity-test-runner) v4.3.1 |
+| [`actions/upload-artifact`](./actions/upload-artifact) | Upload a build artifact | [`actions/upload-artifact`](https://github.com/actions/upload-artifact) v7.0.1 |
+| [`actions/upload-pages-artifact`](./actions/upload-pages-artifact) | Upload a GitHub Pages artifact | [`actions/upload-pages-artifact`](https://github.com/actions/upload-pages-artifact) v5.0.0 |
 
 ### Original Actions
 
@@ -60,6 +65,11 @@ steps:
     with:
       name: my-artifact
       path: artifacts/
+
+  - uses: AndanteTribe/Actions/actions/create-github-app-token@main
+    with:
+      client-id: ${{ secrets.BOT_CLIENT_ID }}
+      private-key: ${{ secrets.PRIVATE_KEY }}
 ```
 
 ## Dependabot

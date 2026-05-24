@@ -19,7 +19,37 @@ updates:
       day: monday
 
   - package-ecosystem: github-actions
+    directory: /actions/configure-pages
+    schedule:
+      interval: weekly
+      day: monday
+
+  - package-ecosystem: github-actions
+    directory: /actions/create-github-app-token
+    schedule:
+      interval: weekly
+      day: monday
+
+  - package-ecosystem: github-actions
+    directory: /actions/create-unitypackage
+    schedule:
+      interval: weekly
+      day: monday
+
+  - package-ecosystem: github-actions
+    directory: /actions/deploy-pages
+    schedule:
+      interval: weekly
+      day: monday
+
+  - package-ecosystem: github-actions
     directory: /actions/setup-dotnet
+    schedule:
+      interval: weekly
+      day: monday
+
+  - package-ecosystem: github-actions
+    directory: /actions/unity-cache
     schedule:
       interval: weekly
       day: monday
@@ -43,7 +73,7 @@ updates:
       day: monday
 
   - package-ecosystem: github-actions
-    directory: /actions/unity-cache
+    directory: /actions/upload-pages-artifact
     schedule:
       interval: weekly
       day: monday

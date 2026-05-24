@@ -1,0 +1,42 @@
+name: 'Configure GitHub Pages'
+description: 'A GitHub Action to enable Pages, extract various metadata about a site, and configure some supported static site generators.'
+author: 'AndanteTribe'
+inputs:
+  static_site_generator:
+    description: 'Optional static site generator to attempt to configure: "nuxt", "next", "gatsby", or "sveltekit"'
+    required: false
+  generator_config_file:
+    description: 'Optional file path to static site generator configuration file'
+    required: false
+  token:
+    description: 'GitHub token'
+    default: ${{ github.token }}
+    required: true
+  enablement:
+    description: 'Try to enable Pages for the repository if it is not already enabled.'
+    default: 'false'
+    required: false
+outputs:
+  base_url:
+    description: 'GitHub Pages site full base URL.'
+    value: ${{ steps.configure-pages.outputs.base_url }}
+  origin:
+    description: 'GitHub Pages site origin.'
+    value: ${{ steps.configure-pages.outputs.origin }}
+  host:
+    description: 'GitHub Pages site host.'
+    value: ${{ steps.configure-pages.outputs.host }}
+  base_path:
+    description: 'GitHub Pages site full base path.'
+    value: ${{ steps.configure-pages.outputs.base_path }}
+runs:
+  using: 'composite'
+  steps:
+    # see: https://github.com/actions/configure-pages
+    - id: configure-pages
+      uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+      with:
+        static_site_generator: ${{ inputs.static_site_generator }}
+        generator_config_file: ${{ inputs.generator_config_file }}
+        token: ${{ inputs.token }}
+        enablement: ${{ inputs.enablement }}
