@@ -6,6 +6,8 @@ updates:
     schedule:
       interval: weekly
       day: monday
+    cooldown:
+      default-days: 7
     groups:
       github-actions:
         patterns:
@@ -17,39 +19,53 @@ updates:
     schedule:
       interval: weekly
       day: monday
+    cooldown:
+      default-days: 7
 
   - package-ecosystem: github-actions
     directory: /actions/create-github-app-token
     schedule:
       interval: weekly
       day: monday
+    cooldown:
+      default-days: 7
 
   - package-ecosystem: github-actions
     directory: /actions/setup-dotnet
     schedule:
       interval: weekly
       day: monday
+    cooldown:
+      default-days: 7
 
   - package-ecosystem: github-actions
     directory: /actions/unity-cache
     schedule:
       interval: weekly
       day: monday
+    cooldown:
+      default-days: 7
 
   - package-ecosystem: github-actions
     directory: /actions/unity-meta-check
     schedule:
       interval: weekly
       day: monday
+    cooldown:
+      default-days: 7
 
   - package-ecosystem: github-actions
     directory: /actions/unity-test-runner
     schedule:
       interval: weekly
       day: monday
+    cooldown:
+      default-days: 7
 
   - package-ecosystem: github-actions
     directory: /actions/upload-artifact
     schedule:
       interval: weekly
       day: monday
+    cooldown:
+      default-days: 7
