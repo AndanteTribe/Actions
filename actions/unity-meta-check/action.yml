@@ -1,0 +1,90 @@
+name: 'Unity Meta Files Check'
+description: 'Check missing/dangling Unity meta files'
+author: 'AndanteTribe'
+inputs:
+  log_level:
+    description: 'Log level for unity-meta-check toolchains (available: ERROR/WARN/INFO/DEBUG)'
+    required: false
+    default: 'INFO'
+  target_path:
+    description: 'Target directory path to check. Relative path is treated as a path from $GITHUB_WORKSPACE (default: .)'
+    required: false
+    default: '.'
+  target_type:
+    description: 'Target type for unity-meta-check (available: auto-detect/unity-project/unity-project-sub-dir/upm-package)'
+    required: false
+    default: 'auto-detect'
+  ignore_dangling:
+    description: 'Ignore dangling .meta'
+    required: false
+    default: 'false'
+  ignore_case:
+    description: 'Do not treat case of file paths'
+    required: false
+    default: 'false'
+  ignore_submodules_and_nested:
+    description: 'Ignore git submodules and nesting repositories'
+    required: false
+    default: 'false'
+  ignored_file_path:
+    description: 'Path to .meta-check-ignore (note: keep empty if .meta-check-ignore does not exist)'
+    required: false
+    default: ''
+  enable_autofix:
+    description: 'Enable autofix (note: it can repair very limited file types)'
+    required: false
+    default: 'false'
+  autofix_globs:
+    description: 'Comma separated globs that match directories to where to allow autofix'
+    required: false
+    default: '*'
+  enable_junit:
+    description: 'Enable JUnit-style reporting'
+    required: false
+    default: 'false'
+  junit_xml_path:
+    description: 'File path for generated JUnit test reports (note: required if enable_junit is true)'
+    required: false
+    default: ''
+  enable_pr_comment:
+    description: 'Enable reporting via GitHub Pull Request Comments'
+    required: false
+    default: 'false'
+  pr_comment_lang:
+    description: 'Language code for GitHub Pull Request Comments (available: en/ja)'
+    required: false
+    default: 'en'
+  pr_comment_tmpl_file:
+    description: 'File path to custom template file for GitHub Pull Request Comments'
+    required: false
+    default: ''
+  pr_comment_pull_number:
+    description: 'Pull request number to comment'
+    required: false
+    default: '0'
+  pr_comment_send_success:
+    description: 'Send a comment if no missing/dangling .meta found'
+    required: false
+    default: 'false'
+runs:
+  using: 'composite'
+  steps:
+    # see: https://github.com/DeNA/unity-meta-check
+    - uses: DeNA/unity-meta-check@a2e35e2c0b652031facd143db6f0a438b49de38a # v4.0.0
+      with:
+        log_level: ${{ inputs.log_level }}
+        target_path: ${{ inputs.target_path }}
+        target_type: ${{ inputs.target_type }}
+        ignore_dangling: ${{ inputs.ignore_dangling }}
+        ignore_case: ${{ inputs.ignore_case }}
+        ignore_submodules_and_nested: ${{ inputs.ignore_submodules_and_nested }}
+        ignored_file_path: ${{ inputs.ignored_file_path }}
+        enable_autofix: ${{ inputs.enable_autofix }}
+        autofix_globs: ${{ inputs.autofix_globs }}
+        enable_junit: ${{ inputs.enable_junit }}
+        junit_xml_path: ${{ inputs.junit_xml_path }}
+        enable_pr_comment: ${{ inputs.enable_pr_comment }}
+        pr_comment_lang: ${{ inputs.pr_comment_lang }}
+        pr_comment_tmpl_file: ${{ inputs.pr_comment_tmpl_file }}
+        pr_comment_pull_number: ${{ inputs.pr_comment_pull_number }}
+        pr_comment_send_success: ${{ inputs.pr_comment_send_success }}

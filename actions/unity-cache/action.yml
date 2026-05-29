@@ -42,7 +42,8 @@ runs:
     - name: Restore nuget cache
       if: ${{ inputs.use-nugetforunity == 'true' && !contains(runner.labels, 'self-hosted') }}
       id: nuget-cache
-      uses: actions/cache@v4
+      # see: https://github.com/actions/cache
+      uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
       with:
         path: ${{ inputs.nuget-packages-path }}
         key: nuget-cache-${{ steps.info.outputs.name }}
@@ -60,7 +61,8 @@ runs:
     - name: Restore unity project cache
       if: ${{ !contains(runner.labels, 'self-hosted') }}
       id: unity-cache
-      uses: actions/cache@v4
+      # see: https://github.com/actions/cache
+      uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
       with:
         path: ${{ inputs.unity-project-path }}/Library
         key: unity-cache-${{ steps.info.outputs.name }}

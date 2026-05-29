@@ -1,0 +1,54 @@
+name: 'Create GitHub App Token'
+description: 'GitHub Action for creating a GitHub App installation access token'
+author: 'AndanteTribe'
+inputs:
+  client-id:
+    description: 'GitHub App Client ID'
+    required: false
+  app-id:
+    description: 'GitHub App ID (deprecated, use client-id instead)'
+    required: false
+  private-key:
+    description: 'GitHub App private key'
+    required: true
+  owner:
+    description: 'The owner of the GitHub App installation (defaults to current repository owner)'
+    required: false
+  repositories:
+    description: 'Comma or newline-separated list of repositories to grant the token access to'
+    required: false
+  enterprise:
+    description: "The slug of the enterprise account where the GitHub App is installed (cannot be used with 'owner' or 'repositories')"
+    required: false
+  skip-token-revoke:
+    description: 'If true, the token will not be revoked when the current job is complete'
+    required: false
+    default: 'false'
+  github-api-url:
+    description: 'The URL of the GitHub REST API.'
+    default: ${{ github.api_url }}
+outputs:
+  token:
+    description: 'GitHub installation access token'
+    value: ${{ steps.create-github-app-token.outputs.token }}
+  installation-id:
+    description: 'GitHub App installation ID'
+    value: ${{ steps.create-github-app-token.outputs.installation-id }}
+  app-slug:
+    description: 'GitHub App slug'
+    value: ${{ steps.create-github-app-token.outputs.app-slug }}
+runs:
+  using: 'composite'
+  steps:
+    # see: https://github.com/actions/create-github-app-token
+    - id: create-github-app-token
+      uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+      with:
+        client-id: ${{ inputs.client-id }}
+        app-id: ${{ inputs.app-id }}
+        private-key: ${{ inputs.private-key }}
+        owner: ${{ inputs.owner }}
+        repositories: ${{ inputs.repositories }}
+        enterprise: ${{ inputs.enterprise }}
+        skip-token-revoke: ${{ inputs.skip-token-revoke }}
+        github-api-url: ${{ inputs.github-api-url }}

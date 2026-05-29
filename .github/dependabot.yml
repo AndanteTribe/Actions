@@ -1,0 +1,71 @@
+version: 2
+updates:
+  # Maintain dependencies for GitHub Actions used in workflows
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    cooldown:
+      default-days: 7
+    groups:
+      github-actions:
+        patterns:
+          - '*'
+
+  # Maintain pinned SHA versions in wrapper actions
+  - package-ecosystem: github-actions
+    directory: /actions/checkout
+    schedule:
+      interval: weekly
+      day: monday
+    cooldown:
+      default-days: 7
+
+  - package-ecosystem: github-actions
+    directory: /actions/create-github-app-token
+    schedule:
+      interval: weekly
+      day: monday
+    cooldown:
+      default-days: 7
+
+  - package-ecosystem: github-actions
+    directory: /actions/setup-dotnet
+    schedule:
+      interval: weekly
+      day: monday
+    cooldown:
+      default-days: 7
+
+  - package-ecosystem: github-actions
+    directory: /actions/unity-cache
+    schedule:
+      interval: weekly
+      day: monday
+    cooldown:
+      default-days: 7
+
+  - package-ecosystem: github-actions
+    directory: /actions/unity-meta-check
+    schedule:
+      interval: weekly
+      day: monday
+    cooldown:
+      default-days: 7
+
+  - package-ecosystem: github-actions
+    directory: /actions/unity-test-runner
+    schedule:
+      interval: weekly
+      day: monday
+    cooldown:
+      default-days: 7
+
+  - package-ecosystem: github-actions
+    directory: /actions/upload-artifact
+    schedule:
+      interval: weekly
+      day: monday
+    cooldown:
+      default-days: 7

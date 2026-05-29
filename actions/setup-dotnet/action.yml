@@ -1,0 +1,60 @@
+name: 'Setup .NET SDK'
+description: 'Set up a specific version of the .NET SDK and authentication to private NuGet repository'
+author: 'AndanteTribe'
+inputs:
+  dotnet-version:
+    description: 'Optional SDK version(s) to use. If not provided, will install global.json version when available. Examples: 9.0.x, 8.0.x'
+    required: false
+  dotnet-quality:
+    description: 'Optional quality of the build. The possible values are: daily, signed, validated, preview, ga.'
+    required: false
+    default: ''
+  global-json-file:
+    description: "Optional global.json location, if your global.json isn't located in the root of the repo."
+    required: false
+  source-url:
+    description: 'Optional package source for which to set up authentication.'
+    required: false
+  owner:
+    description: 'Optional OWNER for using packages from GitHub Package Registry organizations/users other than the current repository owner.'
+    required: false
+  config-file:
+    description: "Optional NuGet.config location, if your NuGet.config isn't located in the root of the repo."
+    required: false
+  cache:
+    description: 'Optional input to enable caching of the NuGet global-packages folder'
+    required: false
+    default: 'false'
+  cache-dependency-path:
+    description: 'Used to specify the path to a dependency file: packages.lock.json. Supports wildcards or a list of file names for caching multiple dependencies.'
+    required: false
+  workloads:
+    description: 'Optional SDK workloads to install for additional platform support. Examples: wasm-tools, maui, aspire.'
+    required: false
+  architecture:
+    description: 'Optional architecture for the .NET install. Supported values: x64, x86, arm64, amd64, arm, s390x, ppc64le, riscv64.'
+    required: false
+outputs:
+  cache-hit:
+    description: 'A boolean value to indicate if a cache was hit.'
+    value: ${{ steps.setup-dotnet.outputs.cache-hit }}
+  dotnet-version:
+    description: 'Contains the installed by action .NET SDK version for reuse.'
+    value: ${{ steps.setup-dotnet.outputs.dotnet-version }}
+runs:
+  using: 'composite'
+  steps:
+    # see: https://github.com/actions/setup-dotnet
+    - id: setup-dotnet
+      uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5.2.0
+      with:
+        dotnet-version: ${{ inputs.dotnet-version }}
+        dotnet-quality: ${{ inputs.dotnet-quality != '' && inputs.dotnet-quality || null }}
+        global-json-file: ${{ inputs.global-json-file }}
+        source-url: ${{ inputs.source-url }}
+        owner: ${{ inputs.owner }}
+        config-file: ${{ inputs.config-file }}
+        cache: ${{ inputs.cache }}
+        cache-dependency-path: ${{ inputs.cache-dependency-path }}
+        workloads: ${{ inputs.workloads }}
+        architecture: ${{ inputs.architecture }}
