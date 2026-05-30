@@ -73,12 +73,20 @@ runs:
         GHASEC_OUTCOME: ${{ steps.ghasec.outcome }}
       run: |
         failed=0
-        for tool in ACTIONLINT GHALINT ZIZMOR GHASEC; do
-          outcome_var="${tool}_OUTCOME"
-          outcome="${!outcome_var}"
-          if [ "$outcome" = "failure" ]; then
-            echo "::error::${tool,,} reported findings or failed"
-            failed=1
-          fi
-        done
+        if [ "$ACTIONLINT_OUTCOME" = "failure" ]; then
+          echo "::error::actionlint reported findings or failed"
+          failed=1
+        fi
+        if [ "$GHALINT_OUTCOME" = "failure" ]; then
+          echo "::error::ghalint reported findings or failed"
+          failed=1
+        fi
+        if [ "$ZIZMOR_OUTCOME" = "failure" ]; then
+          echo "::error::zizmor reported findings or failed"
+          failed=1
+        fi
+        if [ "$GHASEC_OUTCOME" = "failure" ]; then
+          echo "::error::ghasec reported findings or failed"
+          failed=1
+        fi
         exit "$failed"
