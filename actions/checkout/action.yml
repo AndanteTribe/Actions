@@ -26,9 +26,6 @@ inputs:
   ssh-user:
     description: 'The user to use when connecting to the remote SSH host.'
     default: git
-  persist-credentials:
-    description: 'Whether to configure the token or SSH key with the local git config'
-    default: 'true'
   path:
     description: 'Relative path under $GITHUB_WORKSPACE to place the repository'
   clean:
@@ -87,7 +84,7 @@ runs:
         ssh-known-hosts: ${{ inputs.ssh-known-hosts }}
         ssh-strict: ${{ inputs.ssh-strict }}
         ssh-user: ${{ inputs.ssh-user }}
-        persist-credentials: ${{ inputs.persist-credentials }}
+        persist-credentials: false
         path: ${{ inputs.path }}
         clean: ${{ inputs.clean }}
         filter: ${{ inputs.filter != '' && inputs.filter || null }}

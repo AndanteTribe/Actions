@@ -17,9 +17,8 @@ jobs:
       contents: read
     steps:
       # see: https://github.com/AndanteTribe/Actions/tree/main/actions/checkout
-      - uses: AndanteTribe/Actions/actions/checkout@main
-        with:
-          persist-credentials: false
+      # ghasec-ignore: unpinned-action
+      - uses: AndanteTribe/Actions/actions/checkout@main # zizmor: ignore[unpinned-uses] repository-local action reference is intentionally tracked on @main
       - uses: ./actions/static-analysis
         with:
           token: ${{ github.token }}
