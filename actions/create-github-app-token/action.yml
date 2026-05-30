@@ -264,57 +264,57 @@ runs:
         enterprise: ${{ inputs.enterprise }}
         skip-token-revoke: false
         github-api-url: ${{ inputs.github-api-url }}
-        permission-actions: ${{ inputs.permission-actions != 'false' && inputs.permission-actions || null }}
-        permission-administration: ${{ inputs.permission-administration != 'false' && inputs.permission-administration || null }}
-        permission-artifact-metadata: ${{ inputs.permission-artifact-metadata != 'false' && inputs.permission-artifact-metadata || null }}
-        permission-attestations: ${{ inputs.permission-attestations != 'false' && inputs.permission-attestations || null }}
-        permission-checks: ${{ inputs.permission-checks != 'false' && inputs.permission-checks || null }}
-        permission-codespaces: ${{ inputs.permission-codespaces != 'false' && inputs.permission-codespaces || null }}
-        permission-contents: ${{ inputs.permission-contents != 'false' && inputs.permission-contents || null }}
-        permission-custom-properties-for-organizations: ${{ inputs.permission-custom-properties-for-organizations != 'false' && inputs.permission-custom-properties-for-organizations || null }}
-        permission-dependabot-secrets: ${{ inputs.permission-dependabot-secrets != 'false' && inputs.permission-dependabot-secrets || null }}
-        permission-deployments: ${{ inputs.permission-deployments != 'false' && inputs.permission-deployments || null }}
-        permission-discussions: ${{ inputs.permission-discussions != 'false' && inputs.permission-discussions || null }}
-        permission-email-addresses: ${{ inputs.permission-email-addresses != 'false' && inputs.permission-email-addresses || null }}
-        permission-enterprise-custom-properties-for-organizations: ${{ inputs.permission-enterprise-custom-properties-for-organizations != 'false' && inputs.permission-enterprise-custom-properties-for-organizations || null }}
-        permission-environments: ${{ inputs.permission-environments != 'false' && inputs.permission-environments || null }}
-        permission-followers: ${{ inputs.permission-followers != 'false' && inputs.permission-followers || null }}
-        permission-git-ssh-keys: ${{ inputs.permission-git-ssh-keys != 'false' && inputs.permission-git-ssh-keys || null }}
-        permission-gpg-keys: ${{ inputs.permission-gpg-keys != 'false' && inputs.permission-gpg-keys || null }}
-        permission-interaction-limits: ${{ inputs.permission-interaction-limits != 'false' && inputs.permission-interaction-limits || null }}
-        permission-issues: ${{ inputs.permission-issues != 'false' && inputs.permission-issues || null }}
-        permission-members: ${{ inputs.permission-members != 'false' && inputs.permission-members || null }}
-        permission-merge-queues: ${{ inputs.permission-merge-queues != 'false' && inputs.permission-merge-queues || null }}
-        permission-metadata: ${{ inputs.permission-metadata != 'false' && inputs.permission-metadata || null }}
-        permission-organization-administration: ${{ inputs.permission-organization-administration != 'false' && inputs.permission-organization-administration || null }}
-        permission-organization-announcement-banners: ${{ inputs.permission-organization-announcement-banners != 'false' && inputs.permission-organization-announcement-banners || null }}
-        permission-organization-copilot-seat-management: ${{ inputs.permission-organization-copilot-seat-management != 'false' && inputs.permission-organization-copilot-seat-management || null }}
-        permission-organization-custom-org-roles: ${{ inputs.permission-organization-custom-org-roles != 'false' && inputs.permission-organization-custom-org-roles || null }}
-        permission-organization-custom-properties: ${{ inputs.permission-organization-custom-properties != 'false' && inputs.permission-organization-custom-properties || null }}
-        permission-organization-custom-roles: ${{ inputs.permission-organization-custom-roles != 'false' && inputs.permission-organization-custom-roles || null }}
-        permission-organization-events: ${{ inputs.permission-organization-events != 'false' && inputs.permission-organization-events || null }}
-        permission-organization-hooks: ${{ inputs.permission-organization-hooks != 'false' && inputs.permission-organization-hooks || null }}
-        permission-organization-packages: ${{ inputs.permission-organization-packages != 'false' && inputs.permission-organization-packages || null }}
-        permission-organization-personal-access-token-requests: ${{ inputs.permission-organization-personal-access-token-requests != 'false' && inputs.permission-organization-personal-access-token-requests || null }}
-        permission-organization-personal-access-tokens: ${{ inputs.permission-organization-personal-access-tokens != 'false' && inputs.permission-organization-personal-access-tokens || null }}
-        permission-organization-plan: ${{ inputs.permission-organization-plan != 'false' && inputs.permission-organization-plan || null }}
-        permission-organization-projects: ${{ inputs.permission-organization-projects != 'false' && inputs.permission-organization-projects || null }}
-        permission-organization-secrets: ${{ inputs.permission-organization-secrets != 'false' && inputs.permission-organization-secrets || null }}
-        permission-organization-self-hosted-runners: ${{ inputs.permission-organization-self-hosted-runners != 'false' && inputs.permission-organization-self-hosted-runners || null }}
-        permission-organization-user-blocking: ${{ inputs.permission-organization-user-blocking != 'false' && inputs.permission-organization-user-blocking || null }}
-        permission-packages: ${{ inputs.permission-packages != 'false' && inputs.permission-packages || null }}
-        permission-pages: ${{ inputs.permission-pages != 'false' && inputs.permission-pages || null }}
-        permission-profile: ${{ inputs.permission-profile != 'false' && inputs.permission-profile || null }}
-        permission-pull-requests: ${{ inputs.permission-pull-requests != 'false' && inputs.permission-pull-requests || null }}
-        permission-repository-custom-properties: ${{ inputs.permission-repository-custom-properties != 'false' && inputs.permission-repository-custom-properties || null }}
-        permission-repository-hooks: ${{ inputs.permission-repository-hooks != 'false' && inputs.permission-repository-hooks || null }}
-        permission-repository-projects: ${{ inputs.permission-repository-projects != 'false' && inputs.permission-repository-projects || null }}
-        permission-secret-scanning-alerts: ${{ inputs.permission-secret-scanning-alerts != 'false' && inputs.permission-secret-scanning-alerts || null }}
-        permission-secrets: ${{ inputs.permission-secrets != 'false' && inputs.permission-secrets || null }}
-        permission-security-events: ${{ inputs.permission-security-events != 'false' && inputs.permission-security-events || null }}
-        permission-single-file: ${{ inputs.permission-single-file != 'false' && inputs.permission-single-file || null }}
-        permission-starring: ${{ inputs.permission-starring != 'false' && inputs.permission-starring || null }}
-        permission-statuses: ${{ inputs.permission-statuses != 'false' && inputs.permission-statuses || null }}
-        permission-team-discussions: ${{ inputs.permission-team-discussions != 'false' && inputs.permission-team-discussions || null }}
-        permission-vulnerability-alerts: ${{ inputs.permission-vulnerability-alerts != 'false' && inputs.permission-vulnerability-alerts || null }}
-        permission-workflows: ${{ inputs.permission-workflows != 'false' && inputs.permission-workflows || null }}
+        permission-actions: ${{ inputs.permission-actions || null }}
+        permission-administration: ${{ inputs.permission-administration || null }}
+        permission-artifact-metadata: ${{ inputs.permission-artifact-metadata || null }}
+        permission-attestations: ${{ inputs.permission-attestations || null }}
+        permission-checks: ${{ inputs.permission-checks || null }}
+        permission-codespaces: ${{ inputs.permission-codespaces || null }}
+        permission-contents: ${{ inputs.permission-contents || null }}
+        permission-custom-properties-for-organizations: ${{ inputs.permission-custom-properties-for-organizations || null }}
+        permission-dependabot-secrets: ${{ inputs.permission-dependabot-secrets || null }}
+        permission-deployments: ${{ inputs.permission-deployments || null }}
+        permission-discussions: ${{ inputs.permission-discussions || null }}
+        permission-email-addresses: ${{ inputs.permission-email-addresses || null }}
+        permission-enterprise-custom-properties-for-organizations: ${{ inputs.permission-enterprise-custom-properties-for-organizations || null }}
+        permission-environments: ${{ inputs.permission-environments || null }}
+        permission-followers: ${{ inputs.permission-followers || null }}
+        permission-git-ssh-keys: ${{ inputs.permission-git-ssh-keys || null }}
+        permission-gpg-keys: ${{ inputs.permission-gpg-keys || null }}
+        permission-interaction-limits: ${{ inputs.permission-interaction-limits || null }}
+        permission-issues: ${{ inputs.permission-issues || null }}
+        permission-members: ${{ inputs.permission-members || null }}
+        permission-merge-queues: ${{ inputs.permission-merge-queues || null }}
+        permission-metadata: ${{ inputs.permission-metadata || null }}
+        permission-organization-administration: ${{ inputs.permission-organization-administration || null }}
+        permission-organization-announcement-banners: ${{ inputs.permission-organization-announcement-banners || null }}
+        permission-organization-copilot-seat-management: ${{ inputs.permission-organization-copilot-seat-management || null }}
+        permission-organization-custom-org-roles: ${{ inputs.permission-organization-custom-org-roles || null }}
+        permission-organization-custom-properties: ${{ inputs.permission-organization-custom-properties || null }}
+        permission-organization-custom-roles: ${{ inputs.permission-organization-custom-roles || null }}
+        permission-organization-events: ${{ inputs.permission-organization-events || null }}
+        permission-organization-hooks: ${{ inputs.permission-organization-hooks || null }}
+        permission-organization-packages: ${{ inputs.permission-organization-packages || null }}
+        permission-organization-personal-access-token-requests: ${{ inputs.permission-organization-personal-access-token-requests || null }}
+        permission-organization-personal-access-tokens: ${{ inputs.permission-organization-personal-access-tokens || null }}
+        permission-organization-plan: ${{ inputs.permission-organization-plan || null }}
+        permission-organization-projects: ${{ inputs.permission-organization-projects || null }}
+        permission-organization-secrets: ${{ inputs.permission-organization-secrets || null }}
+        permission-organization-self-hosted-runners: ${{ inputs.permission-organization-self-hosted-runners || null }}
+        permission-organization-user-blocking: ${{ inputs.permission-organization-user-blocking || null }}
+        permission-packages: ${{ inputs.permission-packages || null }}
+        permission-pages: ${{ inputs.permission-pages || null }}
+        permission-profile: ${{ inputs.permission-profile || null }}
+        permission-pull-requests: ${{ inputs.permission-pull-requests || null }}
+        permission-repository-custom-properties: ${{ inputs.permission-repository-custom-properties || null }}
+        permission-repository-hooks: ${{ inputs.permission-repository-hooks || null }}
+        permission-repository-projects: ${{ inputs.permission-repository-projects || null }}
+        permission-secret-scanning-alerts: ${{ inputs.permission-secret-scanning-alerts || null }}
+        permission-secrets: ${{ inputs.permission-secrets || null }}
+        permission-security-events: ${{ inputs.permission-security-events || null }}
+        permission-single-file: ${{ inputs.permission-single-file || null }}
+        permission-starring: ${{ inputs.permission-starring || null }}
+        permission-statuses: ${{ inputs.permission-statuses || null }}
+        permission-team-discussions: ${{ inputs.permission-team-discussions || null }}
+        permission-vulnerability-alerts: ${{ inputs.permission-vulnerability-alerts || null }}
+        permission-workflows: ${{ inputs.permission-workflows || null }}
