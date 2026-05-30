@@ -40,7 +40,11 @@ runs:
       continue-on-error: true
       shell: bash
       run: |
-        "$RUNNER_TEMP/ghalint/bin/ghalint" run --config "${GITHUB_WORKSPACE}/ghalint.yaml"
+        if [ -f "${GITHUB_WORKSPACE}/ghalint.yaml" ]; then
+          "$RUNNER_TEMP/ghalint/bin/ghalint" run --config "${GITHUB_WORKSPACE}/ghalint.yaml"
+        else
+          "$RUNNER_TEMP/ghalint/bin/ghalint" run
+        fi
 
     # see: https://github.com/zizmorcore/zizmor
     - name: Install zizmor
