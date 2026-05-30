@@ -21,6 +21,6 @@ jobs:
         with:
           persist-credentials: false
       # see: https://github.com/AndanteTribe/Actions/tree/main/actions/static-analysis
-      - uses: ./actions/static-analysis
+      - uses: AndanteTribe/Actions/actions/static-analysis@f97916557d8e64dca4d22fb784fc99bbb27bf516
         with:
           token: ${{ github.token }}
