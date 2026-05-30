@@ -9,9 +9,19 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    # see: https://github.com/suzuki-shunsuke/actionlint-action
+    # see: https://github.com/rhysd/actionlint
+    - name: Install actionlint
+      shell: bash
+      env:
+        ACTIONLINT_VERSION: 1.7.12
+      run: |
+        mkdir -p "$RUNNER_TEMP/actionlint"
+        curl -sSfL "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz" \
+          | tar -xzf - -C "$RUNNER_TEMP/actionlint" actionlint
+        echo "$RUNNER_TEMP/actionlint" >> "$GITHUB_PATH"
     - name: Run actionlint
-      uses: suzuki-shunsuke/actionlint-action@0c0a95d9968702f70d50b0c6eabaa4dc845436ac # v0.1.4
+      shell: bash
+      run: actionlint
 
     # see: https://github.com/suzuki-shunsuke/ghalint
     - name: Install ghalint
