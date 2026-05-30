@@ -37,7 +37,8 @@ runs:
       name: Run ghalint
       continue-on-error: true
       shell: bash
-      run: "$RUNNER_TEMP/ghalint/bin/ghalint" run
+      run: |
+        "$RUNNER_TEMP/ghalint/bin/ghalint" run
 
     # see: https://github.com/zizmorcore/zizmor
     - name: Install zizmor
@@ -54,7 +55,8 @@ runs:
       shell: bash
       env:
         GH_TOKEN: ${{ inputs.token }}
-      run: "$RUNNER_TEMP/zizmor/bin/zizmor" .
+      run: |
+        "$RUNNER_TEMP/zizmor/bin/zizmor" .
 
     # see: https://github.com/koki-develop/ghasec-action
     - id: ghasec
