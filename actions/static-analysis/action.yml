@@ -1,0 +1,42 @@
+name: 'Static Analysis'
+description: 'Run static analysis tools (actionlint, ghalint, zizmor, ghasec) for GitHub Actions workflows'
+author: 'AndanteTribe'
+inputs:
+  token:
+    description: 'GitHub token for API requests'
+    required: false
+    default: ${{ github.token }}
+runs:
+  using: 'composite'
+  steps:
+    # see: https://github.com/suzuki-shunsuke/actionlint-action
+    - name: Run actionlint
+      uses: suzuki-shunsuke/actionlint-action@0c0a95d9968702f70d50b0c6eabaa4dc845436ac # v0.1.4
+
+    # see: https://github.com/suzuki-shunsuke/ghalint
+    - name: Install ghalint
+      shell: bash
+      env:
+        GHALINT_VERSION: 1.5.6
+      run: |
+        mkdir -p "$RUNNER_TEMP/ghalint"
+        curl -sSfL "https://github.com/suzuki-shunsuke/ghalint/releases/download/v${GHALINT_VERSION}/ghalint_${GHALINT_VERSION}_linux_amd64.tar.gz" \
+          | tar -xzf - -C "$RUNNER_TEMP/ghalint" ghalint
+        echo "$RUNNER_TEMP/ghalint" >> "$GITHUB_PATH"
+    - name: Run ghalint
+      shell: bash
+      run: ghalint run
+
+    # see: https://github.com/zizmorcore/zizmor
+    - name: Run zizmor
+      uses: zizmorcore/zizmor-action@5f14fd08f7cf1cb1609c1e344975f152c7ee938d # v0.5.6
+      with:
+        token: ${{ inputs.token }}
+        advanced-security: 'false'
+        annotations: 'true'
+
+    # see: https://github.com/koki-develop/ghasec-action
+    - name: Run ghasec
+      uses: koki-develop/ghasec-action@4393b9e47c8e13e8d0d3bf6325766cf7e88182fa # v1.1.0
+      with:
+        github-token: ${{ inputs.token }}
