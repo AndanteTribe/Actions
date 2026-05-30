@@ -69,3 +69,11 @@ updates:
       day: monday
     cooldown:
       default-days: 7
+
+  - package-ecosystem: github-actions
+    directory: /actions/static-analysis
+    schedule:
+      interval: weekly
+      day: monday
+    cooldown:
+      default-days: 7

@@ -20,13 +20,225 @@ inputs:
   enterprise:
     description: "The slug of the enterprise account where the GitHub App is installed (cannot be used with 'owner' or 'repositories')"
     required: false
-  skip-token-revoke:
-    description: 'If true, the token will not be revoked when the current job is complete'
-    required: false
-    default: 'false'
   github-api-url:
     description: 'The URL of the GitHub REST API.'
     default: ${{ github.api_url }}
+  permission-actions:
+    description: "The level of permission to grant the access token for GitHub Actions workflows, workflow runs, and artifacts. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-administration:
+    description: "The level of permission to grant the access token for repository creation, deletion, settings, teams, and collaborators creation. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-artifact-metadata:
+    description: "The level of permission to grant the access token to create and retrieve build artifact metadata records. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-attestations:
+    description: "The level of permission to create and retrieve the access token for repository attestations. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-checks:
+    description: "The level of permission to grant the access token for checks on code. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-codespaces:
+    description: "The level of permission to grant the access token to create, edit, delete, and list Codespaces. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-contents:
+    description: "The level of permission to grant the access token for repository contents, commits, branches, downloads, releases, and merges. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-custom-properties-for-organizations:
+    description: "The level of permission to grant the access token to view and edit custom properties for an organization, when allowed by the property. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-dependabot-secrets:
+    description: "The level of permission to grant the access token to manage Dependabot secrets. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-deployments:
+    description: "The level of permission to grant the access token for deployments and deployment statuses. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-discussions:
+    description: "The level of permission to grant the access token for discussions and related comments and labels. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-email-addresses:
+    description: "The level of permission to grant the access token to manage the email addresses belonging to a user. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-enterprise-custom-properties-for-organizations:
+    description: "The level of permission to grant the access token for organization custom properties management at the enterprise level. Can be set to 'read', 'write', or 'admin'."
+    required: false
+    default: 'false'
+  permission-environments:
+    description: "The level of permission to grant the access token for managing repository environments. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-followers:
+    description: "The level of permission to grant the access token to manage the followers belonging to a user. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-git-ssh-keys:
+    description: "The level of permission to grant the access token to manage git SSH keys. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-gpg-keys:
+    description: "The level of permission to grant the access token to view and manage GPG keys belonging to a user. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-interaction-limits:
+    description: "The level of permission to grant the access token to view and manage interaction limits on a repository. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-issues:
+    description: "The level of permission to grant the access token for issues and related comments, assignees, labels, and milestones. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-members:
+    description: "The level of permission to grant the access token for organization teams and members. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-merge-queues:
+    description: "The level of permission to grant the access token to manage the merge queues for a repository. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-metadata:
+    description: "The level of permission to grant the access token to search repositories, list collaborators, and access repository metadata. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-organization-administration:
+    description: "The level of permission to grant the access token to manage access to an organization. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-organization-announcement-banners:
+    description: "The level of permission to grant the access token to view and manage announcement banners for an organization. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-organization-copilot-seat-management:
+    description: "The level of permission to grant the access token for managing access to GitHub Copilot for members of an organization with a Copilot Business subscription. This property is in public preview and is subject to change. Can be set to 'write'."
+    required: false
+    default: 'false'
+  permission-organization-custom-org-roles:
+    description: "The level of permission to grant the access token for custom organization roles management. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-organization-custom-properties:
+    description: "The level of permission to grant the access token for repository custom properties management at the organization level. Can be set to 'read', 'write', or 'admin'."
+    required: false
+    default: 'false'
+  permission-organization-custom-roles:
+    description: "The level of permission to grant the access token for custom repository roles management. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-organization-events:
+    description: "The level of permission to grant the access token to view events triggered by an activity in an organization. Can be set to 'read'."
+    required: false
+    default: 'false'
+  permission-organization-hooks:
+    description: "The level of permission to grant the access token to manage the post-receive hooks for an organization. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-organization-packages:
+    description: "The level of permission to grant the access token for organization packages published to GitHub Packages. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-organization-personal-access-token-requests:
+    description: "The level of permission to grant the access token for viewing and managing fine-grained personal access tokens that have been approved by an organization. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-organization-personal-access-tokens:
+    description: "The level of permission to grant the access token for viewing and managing fine-grained personal access token requests to an organization. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-organization-plan:
+    description: "The level of permission to grant the access token for viewing an organization's plan. Can be set to 'read'."
+    required: false
+    default: 'false'
+  permission-organization-projects:
+    description: "The level of permission to grant the access token to manage organization projects and projects public preview (where available). Can be set to 'read', 'write', or 'admin'."
+    required: false
+    default: 'false'
+  permission-organization-secrets:
+    description: "The level of permission to grant the access token to manage organization secrets. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-organization-self-hosted-runners:
+    description: "The level of permission to grant the access token to view and manage GitHub Actions self-hosted runners available to an organization. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-organization-user-blocking:
+    description: "The level of permission to grant the access token to view and manage users blocked by the organization. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-packages:
+    description: "The level of permission to grant the access token for packages published to GitHub Packages. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-pages:
+    description: "The level of permission to grant the access token to retrieve Pages statuses, configuration, and builds, as well as create new builds. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-profile:
+    description: "The level of permission to grant the access token to manage the profile settings belonging to a user. Can be set to 'write'."
+    required: false
+    default: 'false'
+  permission-pull-requests:
+    description: "The level of permission to grant the access token for pull requests and related comments, assignees, labels, milestones, and merges. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-repository-custom-properties:
+    description: "The level of permission to grant the access token to view and edit custom properties for a repository, when allowed by the property. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-repository-hooks:
+    description: "The level of permission to grant the access token to manage the post-receive hooks for a repository. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-repository-projects:
+    description: "The level of permission to grant the access token to manage repository projects, columns, and cards. Can be set to 'read', 'write', or 'admin'."
+    required: false
+    default: 'false'
+  permission-secret-scanning-alerts:
+    description: "The level of permission to grant the access token to view and manage secret scanning alerts. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-secrets:
+    description: "The level of permission to grant the access token to manage repository secrets. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-security-events:
+    description: "The level of permission to grant the access token to view and manage security events like code scanning alerts. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-single-file:
+    description: "The level of permission to grant the access token to manage just a single file. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-starring:
+    description: "The level of permission to grant the access token to list and manage repositories a user is starring. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-statuses:
+    description: "The level of permission to grant the access token for commit statuses. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-team-discussions:
+    description: "The level of permission to grant the access token to manage team discussions and related comments. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-vulnerability-alerts:
+    description: "The level of permission to grant the access token to manage Dependabot alerts. Can be set to 'read' or 'write'."
+    required: false
+    default: 'false'
+  permission-workflows:
+    description: "The level of permission to grant the access token to update GitHub Actions workflow files. Can be set to 'write'."
+    required: false
+    default: 'false'
 outputs:
   token:
     description: 'GitHub installation access token'
@@ -50,5 +262,59 @@ runs:
         owner: ${{ inputs.owner }}
         repositories: ${{ inputs.repositories }}
         enterprise: ${{ inputs.enterprise }}
-        skip-token-revoke: ${{ inputs.skip-token-revoke }}
+        skip-token-revoke: false
         github-api-url: ${{ inputs.github-api-url }}
+        permission-actions: ${{ inputs.permission-actions != 'false' && inputs.permission-actions || null }}
+        permission-administration: ${{ inputs.permission-administration != 'false' && inputs.permission-administration || null }}
+        permission-artifact-metadata: ${{ inputs.permission-artifact-metadata != 'false' && inputs.permission-artifact-metadata || null }}
+        permission-attestations: ${{ inputs.permission-attestations != 'false' && inputs.permission-attestations || null }}
+        permission-checks: ${{ inputs.permission-checks != 'false' && inputs.permission-checks || null }}
+        permission-codespaces: ${{ inputs.permission-codespaces != 'false' && inputs.permission-codespaces || null }}
+        permission-contents: ${{ inputs.permission-contents != 'false' && inputs.permission-contents || null }}
+        permission-custom-properties-for-organizations: ${{ inputs.permission-custom-properties-for-organizations != 'false' && inputs.permission-custom-properties-for-organizations || null }}
+        permission-dependabot-secrets: ${{ inputs.permission-dependabot-secrets != 'false' && inputs.permission-dependabot-secrets || null }}
+        permission-deployments: ${{ inputs.permission-deployments != 'false' && inputs.permission-deployments || null }}
+        permission-discussions: ${{ inputs.permission-discussions != 'false' && inputs.permission-discussions || null }}
+        permission-email-addresses: ${{ inputs.permission-email-addresses != 'false' && inputs.permission-email-addresses || null }}
+        permission-enterprise-custom-properties-for-organizations: ${{ inputs.permission-enterprise-custom-properties-for-organizations != 'false' && inputs.permission-enterprise-custom-properties-for-organizations || null }}
+        permission-environments: ${{ inputs.permission-environments != 'false' && inputs.permission-environments || null }}
+        permission-followers: ${{ inputs.permission-followers != 'false' && inputs.permission-followers || null }}
+        permission-git-ssh-keys: ${{ inputs.permission-git-ssh-keys != 'false' && inputs.permission-git-ssh-keys || null }}
+        permission-gpg-keys: ${{ inputs.permission-gpg-keys != 'false' && inputs.permission-gpg-keys || null }}
+        permission-interaction-limits: ${{ inputs.permission-interaction-limits != 'false' && inputs.permission-interaction-limits || null }}
+        permission-issues: ${{ inputs.permission-issues != 'false' && inputs.permission-issues || null }}
+        permission-members: ${{ inputs.permission-members != 'false' && inputs.permission-members || null }}
+        permission-merge-queues: ${{ inputs.permission-merge-queues != 'false' && inputs.permission-merge-queues || null }}
+        permission-metadata: ${{ inputs.permission-metadata != 'false' && inputs.permission-metadata || null }}
+        permission-organization-administration: ${{ inputs.permission-organization-administration != 'false' && inputs.permission-organization-administration || null }}
+        permission-organization-announcement-banners: ${{ inputs.permission-organization-announcement-banners != 'false' && inputs.permission-organization-announcement-banners || null }}
+        permission-organization-copilot-seat-management: ${{ inputs.permission-organization-copilot-seat-management != 'false' && inputs.permission-organization-copilot-seat-management || null }}
+        permission-organization-custom-org-roles: ${{ inputs.permission-organization-custom-org-roles != 'false' && inputs.permission-organization-custom-org-roles || null }}
+        permission-organization-custom-properties: ${{ inputs.permission-organization-custom-properties != 'false' && inputs.permission-organization-custom-properties || null }}
+        permission-organization-custom-roles: ${{ inputs.permission-organization-custom-roles != 'false' && inputs.permission-organization-custom-roles || null }}
+        permission-organization-events: ${{ inputs.permission-organization-events != 'false' && inputs.permission-organization-events || null }}
+        permission-organization-hooks: ${{ inputs.permission-organization-hooks != 'false' && inputs.permission-organization-hooks || null }}
+        permission-organization-packages: ${{ inputs.permission-organization-packages != 'false' && inputs.permission-organization-packages || null }}
+        permission-organization-personal-access-token-requests: ${{ inputs.permission-organization-personal-access-token-requests != 'false' && inputs.permission-organization-personal-access-token-requests || null }}
+        permission-organization-personal-access-tokens: ${{ inputs.permission-organization-personal-access-tokens != 'false' && inputs.permission-organization-personal-access-tokens || null }}
+        permission-organization-plan: ${{ inputs.permission-organization-plan != 'false' && inputs.permission-organization-plan || null }}
+        permission-organization-projects: ${{ inputs.permission-organization-projects != 'false' && inputs.permission-organization-projects || null }}
+        permission-organization-secrets: ${{ inputs.permission-organization-secrets != 'false' && inputs.permission-organization-secrets || null }}
+        permission-organization-self-hosted-runners: ${{ inputs.permission-organization-self-hosted-runners != 'false' && inputs.permission-organization-self-hosted-runners || null }}
+        permission-organization-user-blocking: ${{ inputs.permission-organization-user-blocking != 'false' && inputs.permission-organization-user-blocking || null }}
+        permission-packages: ${{ inputs.permission-packages != 'false' && inputs.permission-packages || null }}
+        permission-pages: ${{ inputs.permission-pages != 'false' && inputs.permission-pages || null }}
+        permission-profile: ${{ inputs.permission-profile != 'false' && inputs.permission-profile || null }}
+        permission-pull-requests: ${{ inputs.permission-pull-requests != 'false' && inputs.permission-pull-requests || null }}
+        permission-repository-custom-properties: ${{ inputs.permission-repository-custom-properties != 'false' && inputs.permission-repository-custom-properties || null }}
+        permission-repository-hooks: ${{ inputs.permission-repository-hooks != 'false' && inputs.permission-repository-hooks || null }}
+        permission-repository-projects: ${{ inputs.permission-repository-projects != 'false' && inputs.permission-repository-projects || null }}
+        permission-secret-scanning-alerts: ${{ inputs.permission-secret-scanning-alerts != 'false' && inputs.permission-secret-scanning-alerts || null }}
+        permission-secrets: ${{ inputs.permission-secrets != 'false' && inputs.permission-secrets || null }}
+        permission-security-events: ${{ inputs.permission-security-events != 'false' && inputs.permission-security-events || null }}
+        permission-single-file: ${{ inputs.permission-single-file != 'false' && inputs.permission-single-file || null }}
+        permission-starring: ${{ inputs.permission-starring != 'false' && inputs.permission-starring || null }}
+        permission-statuses: ${{ inputs.permission-statuses != 'false' && inputs.permission-statuses || null }}
+        permission-team-discussions: ${{ inputs.permission-team-discussions != 'false' && inputs.permission-team-discussions || null }}
+        permission-vulnerability-alerts: ${{ inputs.permission-vulnerability-alerts != 'false' && inputs.permission-vulnerability-alerts || null }}
+        permission-workflows: ${{ inputs.permission-workflows != 'false' && inputs.permission-workflows || null }}

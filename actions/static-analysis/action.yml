@@ -1,0 +1,100 @@
+name: 'Static Analysis'
+description: 'Run static analysis tools (actionlint, ghalint, zizmor, ghasec) for GitHub Actions workflows'
+author: 'AndanteTribe'
+inputs:
+  token:
+    description: 'GitHub token for API requests'
+    required: false
+    default: ${{ github.token }}
+runs:
+  using: 'composite'
+  steps:
+    # see: https://github.com/rhysd/actionlint
+    - name: Install actionlint
+      shell: bash
+      env:
+        ACTIONLINT_VERSION: 1.7.12
+      run: |
+        mkdir -p "$RUNNER_TEMP/actionlint/bin"
+        curl -sSfL "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz" \
+          | tar -xzf - -C "$RUNNER_TEMP/actionlint/bin" actionlint
+    - id: actionlint
+      name: Run actionlint
+      continue-on-error: true
+      shell: bash
+      run: |
+        actionlint_bin="${RUNNER_TEMP}/actionlint/bin/actionlint"
+        "${actionlint_bin}"
+
+    # see: https://github.com/suzuki-shunsuke/ghalint
+    - name: Install ghalint
+      shell: bash
+      env:
+        GHALINT_VERSION: 1.5.6
+      run: |
+        mkdir -p "$RUNNER_TEMP/ghalint/bin"
+        curl -sSfL "https://github.com/suzuki-shunsuke/ghalint/releases/download/v${GHALINT_VERSION}/ghalint_${GHALINT_VERSION}_linux_amd64.tar.gz" \
+          | tar -xzf - -C "$RUNNER_TEMP/ghalint/bin" ghalint
+    - id: ghalint
+      name: Run ghalint
+      continue-on-error: true
+      shell: bash
+      run: |
+        if [ -f "${GITHUB_ACTION_PATH}/ghalint.yaml" ]; then
+          "$RUNNER_TEMP/ghalint/bin/ghalint" run --config "${GITHUB_ACTION_PATH}/ghalint.yaml"
+        else
+          "$RUNNER_TEMP/ghalint/bin/ghalint" run
+        fi
+
+    # see: https://github.com/zizmorcore/zizmor
+    - name: Install zizmor
+      shell: bash
+      env:
+        ZIZMOR_VERSION: 1.25.2
+      run: |
+        mkdir -p "$RUNNER_TEMP/zizmor/bin"
+        curl -sSfL "https://github.com/zizmorcore/zizmor/releases/download/v${ZIZMOR_VERSION}/zizmor-x86_64-unknown-linux-gnu.tar.gz" \
+          | tar -xzf - -C "$RUNNER_TEMP/zizmor/bin" zizmor
+    - id: zizmor
+      name: Run zizmor
+      continue-on-error: true
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+      run: |
+        "$RUNNER_TEMP/zizmor/bin/zizmor" .
+
+    # see: https://github.com/koki-develop/ghasec-action
+    - id: ghasec
+      name: Run ghasec
+      continue-on-error: true
+      uses: koki-develop/ghasec-action@4393b9e47c8e13e8d0d3bf6325766cf7e88182fa # v1.1.0
+      with:
+        github-token: ${{ inputs.token }}
+
+    - name: Check analysis results
+      shell: bash
+      env:
+        ACTIONLINT_OUTCOME: ${{ steps.actionlint.outcome }}
+        GHALINT_OUTCOME: ${{ steps.ghalint.outcome }}
+        ZIZMOR_OUTCOME: ${{ steps.zizmor.outcome }}
+        GHASEC_OUTCOME: ${{ steps.ghasec.outcome }}
+      run: |
+        failed=0
+        if [ "$ACTIONLINT_OUTCOME" = "failure" ]; then
+          echo "::error::actionlint reported findings or failed"
+          failed=1
+        fi
+        if [ "$GHALINT_OUTCOME" = "failure" ]; then
+          echo "::error::ghalint reported findings or failed"
+          failed=1
+        fi
+        if [ "$ZIZMOR_OUTCOME" = "failure" ]; then
+          echo "::error::zizmor reported findings or failed"
+          failed=1
+        fi
+        if [ "$GHASEC_OUTCOME" = "failure" ]; then
+          echo "::error::ghasec reported findings or failed"
+          failed=1
+        fi
+        exit "$failed"

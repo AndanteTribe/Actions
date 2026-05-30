@@ -1,0 +1,24 @@
+name: 'Static Analysis'
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions: {}
+
+jobs:
+  static-analysis:
+    name: Static Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      # see: https://github.com/AndanteTribe/Actions/tree/main/actions/checkout
+      # ghasec-ignore: unpinned-action
+      - uses: AndanteTribe/Actions/actions/checkout@main # zizmor: ignore[unpinned-uses] repository-local action reference is intentionally tracked on @main
+      - uses: ./actions/static-analysis
+        with:
+          token: ${{ github.token }}

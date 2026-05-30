@@ -35,7 +35,8 @@ runs:
   steps:
     - name: Fetch unity project info
       id: info
-      uses: AndanteTribe/Actions/actions/fetch-unity-info@main
+      # ghasec-ignore: unpinned-action
+      uses: AndanteTribe/Actions/actions/fetch-unity-info@main # zizmor: ignore[unpinned-uses] repository-local action reference is intentionally tracked on @main
       with:
         unity-project-path: ${{ inputs.unity-project-path }}
 
@@ -53,7 +54,8 @@ runs:
 
     - name: Run NuGetForUnity restore
       if: ${{ inputs.use-nugetforunity == 'true' && steps.nuget-cache.outputs.cache-hit != 'true' }}
-      uses: AndanteTribe/Actions/actions/nugetforunity-restore@main
+      # ghasec-ignore: unpinned-action
+      uses: AndanteTribe/Actions/actions/nugetforunity-restore@main # zizmor: ignore[unpinned-uses] repository-local action reference is intentionally tracked on @main
       with:
         unity-project-path: ${{ inputs.unity-project-path }}
         nuget-packages-path: ${{ inputs.nuget-packages-path }}
