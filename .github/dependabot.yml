@@ -1,18 +1,5 @@
 version: 2
 updates:
-  # Maintain dependencies for GitHub Actions used in workflows
-  - package-ecosystem: github-actions
-    directory: /
-    schedule:
-      interval: weekly
-      day: monday
-    cooldown:
-      default-days: 7
-    groups:
-      github-actions:
-        patterns:
-          - '*'
-
   # Maintain pinned SHA versions in wrapper actions
   - package-ecosystem: github-actions
     directory: /actions/checkout
