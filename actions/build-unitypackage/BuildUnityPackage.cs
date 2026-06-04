@@ -15,7 +15,7 @@ using System.Text.RegularExpressions;
 var assetsInput = Environment.GetEnvironmentVariable("PACKAGE_PATH");
 if (string.IsNullOrWhiteSpace(assetsInput))
 {
-    Console.Error.WriteLine("The ASSETS environment variable is not set.");
+    Console.Error.WriteLine("The PACKAGE_PATH environment variable is not set.");
     Environment.Exit(1);
 }
 
@@ -38,10 +38,10 @@ if (string.IsNullOrWhiteSpace(rootInput))
 {
     rootInput = ".";
 }
-// pathname (パッケージ内に記録される相対パス) を算出する基準ディレクトリ。
+// pathname (パッケージ内に記録される相対パス) を算出する基準パス。
 var rootPath = Path.GetFullPath(Path.Combine(workspace, rootInput));
 
-// 入力は改行/カンマ区切りで複数のファイル・ディレクトリを受け取る。
+// 入力を改行/カンマ区切りに変換
 var entries = assetsInput
     .Split(new[] { '\n', '\r', ',' }, StringSplitOptions.RemoveEmptyEntries)
     .Select(s => s.Trim())
@@ -50,7 +50,7 @@ var entries = assetsInput
 
 var guidRegex = new Regex(@"^guid:\s*([0-9a-fA-F]+)", RegexOptions.Multiline);
 
-// 対象アセットの絶対パスを収集する (ディレクトリは再帰的に展開し、フォルダ自身も含める)。
+// 対象アセットの絶対パスを収集。
 var assetPaths = new SortedSet<string>(StringComparer.Ordinal);
 foreach (var entry in entries)
 {
