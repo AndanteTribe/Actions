@@ -153,7 +153,7 @@ if (!string.IsNullOrEmpty(githubOutput))
     writer.WriteLine(outputPath);
 }
 
-static void WriteDiectory(TarWriter writer, string name)
+static void WriteDirectory(TarWriter writer, string name)
 {
     var entry = new PaxTarEntry(TarEntryType.Directory, name)
     {
