@@ -68,7 +68,7 @@ runs:
     - id: ghasec
       name: Run ghasec
       continue-on-error: true
-      uses: koki-develop/ghasec-action@4393b9e47c8e13e8d0d3bf6325766cf7e88182fa # v1.1.0
+      uses: koki-develop/ghasec-action@2810775d2a300cb3fd9583c36c05b5ee3310c5b8 # v1.1.1
       with:
         github-token: ${{ inputs.token }}
 
