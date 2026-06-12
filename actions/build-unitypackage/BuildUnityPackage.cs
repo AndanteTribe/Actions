@@ -5,52 +5,28 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 // Unityを使わずに .unitypackage を生成する。
 // .unitypackage の実体は gzip 圧縮された tar アーカイブで、アセットごとに
 // 「<guid>/asset」「<guid>/asset.meta」「<guid>/pathname」というエントリを持つ。
 // guid は対応する .meta ファイルの「guid:」行から取得する。
 
-var assetsInput = Environment.GetEnvironmentVariable("PACKAGE_PATH");
-if (string.IsNullOrWhiteSpace(assetsInput))
-{
-    Console.Error.WriteLine("The PACKAGE_PATH environment variable is not set.");
-    Environment.Exit(1);
-}
+var assetsInput = GetRequiredEnv("PACKAGE_PATH");
+var workspace = GetRequiredEnv("GITHUB_WORKSPACE");
 
-var workspace = Environment.GetEnvironmentVariable("GITHUB_WORKSPACE");
-if (string.IsNullOrEmpty(workspace))
-{
-    Console.Error.WriteLine("The GITHUB_WORKSPACE environment variable is not set.");
-    Environment.Exit(1);
-}
-
-var outputInput = Environment.GetEnvironmentVariable("OUTPUT_PATH");
-if (string.IsNullOrWhiteSpace(outputInput))
-{
-    outputInput = "output.unitypackage";
-}
+var outputInput = GetEnvOrDefault("OUTPUT_PATH", "output.unitypackage");
 var outputPath = Path.GetFullPath(Path.Combine(workspace, outputInput));
 
-var rootInput = Environment.GetEnvironmentVariable("ROOT_PATH");
-if (string.IsNullOrWhiteSpace(rootInput))
-{
-    rootInput = ".";
-}
 // pathname (パッケージ内に記録される相対パス) を算出する基準パス。
+var rootInput = GetEnvOrDefault("ROOT_PATH", assetsInput);
 var rootPath = Path.GetFullPath(Path.Combine(workspace, rootInput));
 
 // 入力を改行/カンマ区切りに変換
 var entries = assetsInput
-    .Split(new[] { '\n', '\r', ',' }, StringSplitOptions.RemoveEmptyEntries)
-    .Select(s => s.Trim())
-    .Where(s => s.Length > 0)
-    .ToArray();
+    .Split(new[] { '\n', '\r', ',' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
-var guidRegex = new Regex(@"^guid:\s*([0-9a-fA-F]+)", RegexOptions.Multiline);
-
-// 対象アセットの絶対パスを収集。
+// 対象アセットの絶対パスを収集。重複排除と決定的な順序のため SortedSet を使う。
 var assetPaths = new SortedSet<string>(StringComparer.Ordinal);
 foreach (var entry in entries)
 {
@@ -60,11 +36,11 @@ foreach (var entry in entries)
         assetPaths.Add(full.TrimEnd(Path.DirectorySeparatorChar));
         foreach (var path in Directory.EnumerateFileSystemEntries(full, "*", SearchOption.AllDirectories))
         {
-            if (path.EndsWith(".meta", StringComparison.OrdinalIgnoreCase))
+            // .meta はアセット本体とペアで扱うため、ここでは収集しない。
+            if (!path.EndsWith(".meta", StringComparison.OrdinalIgnoreCase))
             {
-                continue;
+                assetPaths.Add(path);
             }
-            assetPaths.Add(path);
         }
     }
     else if (File.Exists(full))
@@ -80,9 +56,34 @@ foreach (var entry in entries)
 
 if (assetPaths.Count == 0)
 {
-    Console.Error.WriteLine("No assets were resolved from the ASSETS input.");
+    Console.Error.WriteLine("No assets were resolved from the PACKAGE_PATH input.");
     Environment.Exit(1);
 }
+
+// 並列で.metaを収集し、guidを抜き出す。
+// 元のソート順を保つため index 付き配列へ格納し、書き込みは直列で行う。
+var ordered = assetPaths.ToArray();
+var items = new PackItem?[ordered.Length];
+await Parallel.ForEachAsync(Enumerable.Range(0, ordered.Length), async (i, ct) =>
+{
+    var assetPath = ordered[i];
+    var metaPath = assetPath + ".meta";
+    if (!File.Exists(metaPath))
+    {
+        Console.Error.WriteLine($"Missing .meta file for asset (skipped): {assetPath}");
+        return;
+    }
+
+    var metaBytes = await File.ReadAllBytesAsync(metaPath, ct);
+    var guid = TryGetGuid(metaBytes);
+    if (guid is null)
+    {
+        Console.Error.WriteLine($"Could not find a guid in meta file (skipped): {metaPath}");
+        return;
+    }
+
+    items[i] = new PackItem(assetPath, guid, metaBytes);
+});
 
 var outputDir = Path.GetDirectoryName(outputPath);
 if (!string.IsNullOrEmpty(outputDir))
@@ -90,50 +91,41 @@ if (!string.IsNullOrEmpty(outputDir))
     Directory.CreateDirectory(outputDir);
 }
 
+// tarへ変換
 var added = 0;
 using (var fileStream = File.Create(outputPath))
 using (var gzipStream = new GZipStream(fileStream, CompressionLevel.Optimal))
-using (var tarWriter = new TarWriter(gzipStream, TarEntryFormat.Pax))
+// TarWriterのFormatがPAXだと毎回バイト数が変わるらしい（プロセスIDを埋め込むので）
+// そのためUstarを使用してみた
+using (var tarWriter = new TarWriter(gzipStream, TarEntryFormat.Ustar))
 {
-    foreach (var assetPath in assetPaths)
+    foreach (var entry in items)
     {
-        var metaPath = assetPath + ".meta";
-        if (!File.Exists(metaPath))
+        // .meta が無い / guid 不明だった要素は null なのでスキップ。
+        if (entry is not { } item)
         {
-            Console.Error.WriteLine($"Missing .meta file for asset (skipped): {assetPath}");
             continue;
         }
 
-        var metaContent = File.ReadAllText(metaPath);
-        var match = guidRegex.Match(metaContent);
-        if (!match.Success)
+        var relative = Path.GetRelativePath(rootPath, item.AssetPath).Replace(Path.DirectorySeparatorChar, '/');
+
+        // ディレクトリ
+        WriteDirectory(tarWriter, $"{item.Guid}/");
+
+        // guid asset : ファイル本体 ディレクトリだけの場合は存在しない。
+        if (!Directory.Exists(item.AssetPath))
         {
-            Console.Error.WriteLine($"Could not find a guid in meta file (skipped): {metaPath}");
-            continue;
-        }
-        var guid = match.Groups[1].Value;
-
-        // pathname は rootPath からの相対パス。Unity の慣習に合わせて区切りは '/' に統一する。
-        var relative = Path.GetRelativePath(rootPath, assetPath).Replace(Path.DirectorySeparatorChar, '/');
-
-        // <guid>/ ディレクトリエントリ
-        WriteDirectory(tarWriter, $"{guid}/");
-
-        var isDirectory = Directory.Exists(assetPath);
-        if (!isDirectory)
-        {
-            // <guid>/asset : ファイル本体 (フォルダの場合は出力しない)
-            WriteFile(tarWriter, $"{guid}/asset", File.ReadAllBytes(assetPath));
+            WriteFileEntry(tarWriter, $"{item.Guid}/asset", File.OpenRead(item.AssetPath));
         }
 
-        // <guid>/asset.meta : .meta の内容
-        WriteFile(tarWriter, $"{guid}/asset.meta", Encoding.UTF8.GetBytes(metaContent));
+        // <guid>/asset.meta : .meta の内容 (元のバイト列をそのまま保持)
+        WriteFileEntry(tarWriter, $"{item.Guid}/asset.meta", new MemoryStream(item.MetaBytes, writable: false));
 
         // <guid>/pathname : プロジェクト内パス
-        WriteFile(tarWriter, $"{guid}/pathname", Encoding.UTF8.GetBytes(relative));
+        WriteFileEntry(tarWriter, $"{item.Guid}/pathname", new MemoryStream(Encoding.UTF8.GetBytes(relative)));
 
         added++;
-        Console.WriteLine($"Packed: {relative} ({guid})");
+        Console.WriteLine($"Packed: {relative} ({item.Guid})");
     }
 }
 
@@ -149,28 +141,84 @@ var githubOutput = Environment.GetEnvironmentVariable("GITHUB_OUTPUT");
 if (!string.IsNullOrEmpty(githubOutput))
 {
     using var writer = File.AppendText(githubOutput);
-    writer.Write("package-path=");
-    writer.WriteLine(outputPath);
+    writer.WriteLine($"package-path={outputPath}");
+}
+
+// 必須の環境変数を取得する。未設定ならエラーを出して終了する。
+// actionsのUtilとして抜き出しても良いかも？
+static string GetRequiredEnv(string name)
+{
+    var value = Environment.GetEnvironmentVariable(name);
+    if (string.IsNullOrWhiteSpace(value))
+    {
+        Console.Error.WriteLine($"The {name} environment variable is not set.");
+        Environment.Exit(1);
+    }
+    return value!;
+}
+
+// 環境変数を取得する。未設定なら既定値を返す。
+// actionsのUtilとして抜き出しても良いかも？
+static string GetEnvOrDefault(string name, string fallback)
+{
+    var value = Environment.GetEnvironmentVariable(name);
+    return string.IsNullOrEmpty(value) ? fallback : value;
+}
+
+// .meta の中から「guid:」行の値を探す。見つからなければ null。
+static string? TryGetGuid(byte[] metaBytes)
+{
+    foreach (var rawLine in Encoding.UTF8.GetString(metaBytes).AsSpan().EnumerateLines())
+    {
+        var line = rawLine.Trim();
+        if (line.StartsWith("guid:", StringComparison.Ordinal))
+        {
+            // "guid:" 以降の最初のトークンを guid とみなす。
+            var value = line["guid:".Length..].Trim();
+            var end = value.IndexOfAny(" \t#");
+            if (end >= 0)
+            {
+                value = value[..end];
+            }
+            if (!value.IsEmpty)
+            {
+                return value.ToString();
+            }
+        }
+    }
+    return null;
 }
 
 static void WriteDirectory(TarWriter writer, string name)
 {
-    var entry = new PaxTarEntry(TarEntryType.Directory, name)
+    var entry = new UstarTarEntry(TarEntryType.Directory, name)
     {
         Mode = UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute |
                UnixFileMode.GroupRead | UnixFileMode.GroupExecute |
                UnixFileMode.OtherRead | UnixFileMode.OtherExecute,
+        // mtime を固定し、同一入力なら常に同じ .unitypackage が出力されるようにする (再現性 / キャッシュ向き)。
+        ModificationTime = DateTimeOffset.UnixEpoch,
     };
     writer.WriteEntry(entry);
 }
 
-static void WriteFile(TarWriter writer, string name, byte[] content)
+
+
+static void WriteFileEntry(TarWriter writer, string name, Stream content)
 {
-    var entry = new PaxTarEntry(TarEntryType.RegularFile, name)
+    using (content)
     {
-        Mode = UnixFileMode.UserRead | UnixFileMode.UserWrite |
-               UnixFileMode.GroupRead | UnixFileMode.OtherRead,
-        DataStream = new MemoryStream(content),
-    };
-    writer.WriteEntry(entry);
+        var entry = new UstarTarEntry(TarEntryType.RegularFile, name)
+        {
+            Mode = UnixFileMode.UserRead | UnixFileMode.UserWrite |
+                   UnixFileMode.GroupRead | UnixFileMode.OtherRead,
+            // mtime を固定し、出力を再現可能にする。（らしい）
+            ModificationTime = DateTimeOffset.UnixEpoch,
+            DataStream = content,
+        };
+        writer.WriteEntry(entry);
+    }
 }
+
+// .metaごとの要素
+readonly record struct PackItem(string AssetPath, string Guid, byte[] MetaBytes);
