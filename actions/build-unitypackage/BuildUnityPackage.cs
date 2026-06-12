@@ -118,10 +118,10 @@ using (var tarWriter = new TarWriter(gzipStream, TarEntryFormat.Ustar))
             WriteFileEntry(tarWriter, $"{item.Guid}/asset", File.OpenRead(item.AssetPath));
         }
 
-        // <guid>/asset.meta : .meta の内容 (元のバイト列をそのまま保持)
+        // guid asset.meta : .meta の内容 (元のバイト列をそのまま保持)
         WriteFileEntry(tarWriter, $"{item.Guid}/asset.meta", new MemoryStream(item.MetaBytes, writable: false));
 
-        // <guid>/pathname : プロジェクト内パス
+        // guid /pathname : プロジェクト内パス
         WriteFileEntry(tarWriter, $"{item.Guid}/pathname", new MemoryStream(Encoding.UTF8.GetBytes(relative)));
 
         added++;
@@ -137,12 +137,9 @@ if (added == 0)
 
 Console.WriteLine($"Created {outputPath} with {added} asset(s).");
 
-var githubOutput = Environment.GetEnvironmentVariable("GITHUB_OUTPUT");
-if (!string.IsNullOrEmpty(githubOutput))
-{
-    using var writer = File.AppendText(githubOutput);
-    writer.WriteLine($"package-path={outputPath}");
-}
+var githubOutput = GetRequiredEnv("GITHUB_OUTPUT");
+using var writer = File.AppendText(githubOutput);
+writer.WriteLine($"package-path={outputPath}");
 
 // 必須の環境変数を取得する。未設定ならエラーを出して終了する。
 // actionsのUtilとして抜き出しても良いかも？
