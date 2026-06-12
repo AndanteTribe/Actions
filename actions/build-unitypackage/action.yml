@@ -1,0 +1,27 @@
+name: 'Build .unitypackage'
+description: 'Build a .unitypackage from assets and their .meta files without using the Unity Editor.'
+author: 'AndanteTribe'
+inputs:
+  package-path:
+    description: 'Newline or comma separated list of asset files/directories to include. Relative paths are resolved from $GITHUB_WORKSPACE. Directories are packed recursively.'
+    required: true
+  output-path:
+    description: 'Output .unitypackage file path. Relative paths are resolved from $GITHUB_WORKSPACE.'
+    required: false
+    default: 'output.unitypackage'
+  root-path:
+    description: 'Base directory used to compute the in-package asset path (pathname). Relative paths are resolved from $GITHUB_WORKSPACE.'
+    required: false
+    default: '.'
+outputs:
+  package-path:
+    description: 'The absolute path to the generated .unitypackage file.'
+runs:
+  using: docker
+  image: Dockerfile
+  env:
+    PACKAGE_PATH: ${{ inputs.package-path }}
+    OUTPUT_PATH: ${{ inputs.output-path }}
+    ROOT_PATH: ${{ inputs.root-path }}
+  args:
+    - /app/BuildUnityPackage.cs
