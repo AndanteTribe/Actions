@@ -14,6 +14,14 @@ updates:
           - '*'
 
   # Maintain pinned SHA versions in wrapper actions
+  - package-ecosystem: docker
+    directory: /actions/build-unitypackage
+    schedule:
+      interval: weekly
+      day: monday
+    cooldown:
+      default-days: 7
+
   - package-ecosystem: github-actions
     directory: /actions/checkout
     schedule:
@@ -22,8 +30,48 @@ updates:
     cooldown:
       default-days: 7
 
+  - package-ecosystem: docker
+    directory: /actions/code-coverage-report-update
+    schedule:
+      interval: weekly
+      day: monday
+    cooldown:
+      default-days: 7
+
   - package-ecosystem: github-actions
     directory: /actions/create-github-app-token
+    schedule:
+      interval: weekly
+      day: monday
+    cooldown:
+      default-days: 7
+
+  - package-ecosystem: docker
+    directory: /actions/fetch-unity-info
+    schedule:
+      interval: weekly
+      day: monday
+    cooldown:
+      default-days: 7
+
+  - package-ecosystem: docker
+    directory: /actions/get-unity-serial
+    schedule:
+      interval: weekly
+      day: monday
+    cooldown:
+      default-days: 7
+
+  - package-ecosystem: docker
+    directory: /actions/nugetforunity-restore
+    schedule:
+      interval: weekly
+      day: monday
+    cooldown:
+      default-days: 7
+
+  - package-ecosystem: docker
+    directory: /actions/set-outputs
     schedule:
       interval: weekly
       day: monday
