@@ -13,7 +13,7 @@ updates:
         patterns:
           - '*'
 
-  # Maintain pinned SHA versions in wrapper actions
+  # Maintain pinned versions in wrapper actions (Docker image digests + action SHAs)
   - package-ecosystem: docker
     directory: /actions/build-unitypackage
     schedule:
