@@ -69,6 +69,10 @@ updates:
       day: monday
     cooldown:
       default-days: 7
+    ignore:
+      - dependency-name: "mcr.microsoft.com/dotnet/sdk"
+        versions:
+          - ">= 10.0.0"
 
   - package-ecosystem: docker
     directory: /actions/set-outputs
