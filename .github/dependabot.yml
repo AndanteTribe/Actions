@@ -61,7 +61,6 @@ updates:
       day: monday
     cooldown:
       default-days: 7
- 
   - package-ecosystem: docker
     directory: /actions/code-coverage-report-update
     schedule:
