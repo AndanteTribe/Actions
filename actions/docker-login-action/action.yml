@@ -35,7 +35,7 @@ runs:
   steps:
     # see: https://github.com/docker/login-action
     - id: login
-      uses: docker/login-action@3864d6aed8ff134b2ed894ce00c87695c709c870
+      uses: docker/login-action@3864d6aed8ff134b2ed894ce00c87695c709c870 # master
       with:
         registry: ${{ inputs.registry != '' && inputs.registry || null }}
         username: ${{ inputs.username != '' && inputs.username || null }}

@@ -149,7 +149,7 @@ runs:
   steps:
     # see: https://github.com/docker/build-push-action
     - id: build-push
-      uses: docker/build-push-action@ff26911fd365b0233252dfbd8eede1c0e9ef9a51
+      uses: docker/build-push-action@ff26911fd365b0233252dfbd8eede1c0e9ef9a51 # master
       with:
         add-hosts: ${{ inputs.add-hosts != '' && inputs.add-hosts || null }}
         allow: ${{ inputs.allow != '' && inputs.allow || null }}
