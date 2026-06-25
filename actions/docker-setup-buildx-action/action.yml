@@ -71,15 +71,6 @@ outputs:
   nodes:
     description: 'Builder nodes metadata'
     value: ${{ steps.setup-buildx.outputs.nodes }}
-  endpoint:
-    description: 'Builder node endpoint (deprecated, use nodes output instead)'
-    value: ${{ steps.setup-buildx.outputs.endpoint }}
-  status:
-    description: 'Builder node status (deprecated, use nodes output instead)'
-    value: ${{ steps.setup-buildx.outputs.status }}
-  flags:
-    description: 'Builder node flags (deprecated, use nodes output instead)'
-    value: ${{ steps.setup-buildx.outputs.flags }}
 runs:
   using: 'composite'
   steps:
