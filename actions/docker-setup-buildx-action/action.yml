@@ -1,0 +1,103 @@
+name: 'Docker Setup Buildx Action'
+description: 'Wrapper for docker/setup-buildx-action'
+author: 'AndanteTribe'
+inputs:
+  version:
+    description: 'Buildx version. (eg. v0.3.0)'
+    required: false
+    default: ''
+  driver:
+    description: 'Sets the builder driver to be used'
+    required: false
+    default: 'docker-container'
+  driver-opts:
+    description: 'List of additional driver-specific options. (eg. image=moby/buildkit:master)'
+    required: false
+    default: ''
+  buildkitd-flags:
+    description: 'BuildKit daemon flags'
+    required: false
+    default: ''
+  buildkitd-config:
+    description: 'BuildKit daemon config file'
+    required: false
+    default: ''
+  buildkitd-config-inline:
+    description: 'Inline BuildKit daemon config'
+    required: false
+    default: ''
+  use:
+    description: 'Switch to this builder instance'
+    required: false
+    default: 'true'
+  name:
+    description: 'Name of the builder. If not specified, one will be generated or if it already exists, it will be used instead of creating a new one.'
+    required: false
+    default: ''
+  endpoint:
+    description: 'Optional address for docker socket or context from `docker context ls`'
+    required: false
+    default: ''
+  platforms:
+    description: 'Fixed platforms for current node. If not empty, values take priority over the detected ones'
+    required: false
+    default: ''
+  append:
+    description: 'Append additional nodes to the builder'
+    required: false
+    default: ''
+  keep-state:
+    description: 'Keep BuildKit state on cleanup. This is only useful on persistent self-hosted runners.'
+    required: false
+    default: 'false'
+  cache-binary:
+    description: 'Cache buildx binary to GitHub Actions cache backend'
+    required: false
+    default: 'true'
+  cleanup:
+    description: 'Cleanup temp files and remove builder at the end of a job'
+    required: false
+    default: 'true'
+outputs:
+  name:
+    description: 'Builder name'
+    value: ${{ steps.setup-buildx.outputs.name }}
+  driver:
+    description: 'Builder driver'
+    value: ${{ steps.setup-buildx.outputs.driver }}
+  platforms:
+    description: 'Builder node platforms (preferred or available)'
+    value: ${{ steps.setup-buildx.outputs.platforms }}
+  nodes:
+    description: 'Builder nodes metadata'
+    value: ${{ steps.setup-buildx.outputs.nodes }}
+  endpoint:
+    description: 'Builder node endpoint (deprecated, use nodes output instead)'
+    value: ${{ steps.setup-buildx.outputs.endpoint }}
+  status:
+    description: 'Builder node status (deprecated, use nodes output instead)'
+    value: ${{ steps.setup-buildx.outputs.status }}
+  flags:
+    description: 'Builder node flags (deprecated, use nodes output instead)'
+    value: ${{ steps.setup-buildx.outputs.flags }}
+runs:
+  using: 'composite'
+  steps:
+    # see: https://github.com/docker/setup-buildx-action
+    - id: setup-buildx
+      uses: docker/setup-buildx-action@c887d9748da14dcb42b11cf8bcc773b301ea55b5
+      with:
+        version: ${{ inputs.version != '' && inputs.version || null }}
+        driver: ${{ inputs.driver }}
+        driver-opts: ${{ inputs.driver-opts != '' && inputs.driver-opts || null }}
+        buildkitd-flags: ${{ inputs.buildkitd-flags != '' && inputs.buildkitd-flags || null }}
+        buildkitd-config: ${{ inputs.buildkitd-config != '' && inputs.buildkitd-config || null }}
+        buildkitd-config-inline: ${{ inputs.buildkitd-config-inline != '' && inputs.buildkitd-config-inline || null }}
+        use: ${{ inputs.use }}
+        name: ${{ inputs.name != '' && inputs.name || null }}
+        endpoint: ${{ inputs.endpoint != '' && inputs.endpoint || null }}
+        platforms: ${{ inputs.platforms != '' && inputs.platforms || null }}
+        append: ${{ inputs.append != '' && inputs.append || null }}
+        keep-state: ${{ inputs.keep-state }}
+        cache-binary: ${{ inputs.cache-binary }}
+        cleanup: ${{ inputs.cleanup }}

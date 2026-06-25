@@ -1,0 +1,186 @@
+name: 'Docker Build and Push Action'
+description: 'Wrapper for docker/build-push-action'
+author: 'AndanteTribe'
+inputs:
+  add-hosts:
+    description: "List of a customs host-to-IP mapping (e.g., docker:10.180.0.1)"
+    required: false
+    default: ''
+  allow:
+    description: "List of extra privileged entitlement (e.g., network.host,security.insecure)"
+    required: false
+    default: ''
+  annotations:
+    description: "List of annotation to set to the image"
+    required: false
+    default: ''
+  attests:
+    description: "List of attestation parameters (e.g., type=sbom,generator=image)"
+    required: false
+    default: ''
+  build-args:
+    description: "List of build-time variables"
+    required: false
+    default: ''
+  build-contexts:
+    description: "List of additional build contexts (e.g., name=path)"
+    required: false
+    default: ''
+  builder:
+    description: "Builder instance"
+    required: false
+    default: ''
+  cache-from:
+    description: "List of external cache sources for buildx (e.g., user/app:cache, type=local,src=path/to/dir)"
+    required: false
+    default: ''
+  cache-to:
+    description: "List of cache export destinations for buildx (e.g., user/app:cache, type=local,dest=path/to/dir)"
+    required: false
+    default: ''
+  call:
+    description: "Set method for evaluating build (e.g., check)"
+    required: false
+    default: ''
+  cgroup-parent:
+    description: "Optional parent cgroup for the container used in the build"
+    required: false
+    default: ''
+  context:
+    description: "Build's context is the set of files located in the specified PATH or URL"
+    required: false
+    default: ''
+  file:
+    description: "Path to the Dockerfile"
+    required: false
+    default: ''
+  labels:
+    description: "List of metadata for an image"
+    required: false
+    default: ''
+  load:
+    description: "Load is a shorthand for --output=type=docker"
+    required: false
+    default: 'false'
+  network:
+    description: "Set the networking mode for the RUN instructions during build"
+    required: false
+    default: ''
+  no-cache:
+    description: "Do not use cache when building the image"
+    required: false
+    default: 'false'
+  no-cache-filters:
+    description: "Do not cache specified stages"
+    required: false
+    default: ''
+  outputs:
+    description: "List of output destinations (format: type=local,dest=path)"
+    required: false
+    default: ''
+  platforms:
+    description: "List of target platforms for build"
+    required: false
+    default: ''
+  provenance:
+    description: "Generate provenance attestation for the build (shorthand for --attest=type=provenance)"
+    required: false
+    default: ''
+  pull:
+    description: "Always attempt to pull all referenced images"
+    required: false
+    default: 'false'
+  push:
+    description: "Push is a shorthand for --output=type=registry"
+    required: false
+    default: 'false'
+  sbom:
+    description: "Generate SBOM attestation for the build (shorthand for --attest=type=sbom)"
+    required: false
+    default: ''
+  secrets:
+    description: "List of secrets to expose to the build (e.g., key=string, GIT_AUTH_TOKEN=mytoken)"
+    required: false
+    default: ''
+  secret-envs:
+    description: "List of secret env vars to expose to the build (e.g., key=envname, MY_SECRET=MY_ENV_VAR)"
+    required: false
+    default: ''
+  secret-files:
+    description: "List of secret files to expose to the build (e.g., key=filename, MY_SECRET=./secret.txt)"
+    required: false
+    default: ''
+  shm-size:
+    description: "Size of /dev/shm (e.g., 2g)"
+    required: false
+    default: ''
+  ssh:
+    description: "List of SSH agent socket or keys to expose to the build"
+    required: false
+    default: ''
+  tags:
+    description: "List of tags"
+    required: false
+    default: ''
+  target:
+    description: "Sets the target stage to build"
+    required: false
+    default: ''
+  ulimit:
+    description: "Ulimit options (e.g., nofile=1024:1024)"
+    required: false
+    default: ''
+  github-token:
+    description: "GitHub Token used to authenticate against a repository for Git context"
+    required: false
+    default: ${{ github.token }}
+outputs:
+  imageid:
+    description: 'Image ID'
+    value: ${{ steps.build-push.outputs.imageid }}
+  digest:
+    description: 'Image digest'
+    value: ${{ steps.build-push.outputs.digest }}
+  metadata:
+    description: 'Build result metadata'
+    value: ${{ steps.build-push.outputs.metadata }}
+runs:
+  using: 'composite'
+  steps:
+    # see: https://github.com/docker/build-push-action
+    - id: build-push
+      uses: docker/build-push-action@ff26911fd365b0233252dfbd8eede1c0e9ef9a51
+      with:
+        add-hosts: ${{ inputs.add-hosts != '' && inputs.add-hosts || null }}
+        allow: ${{ inputs.allow != '' && inputs.allow || null }}
+        annotations: ${{ inputs.annotations != '' && inputs.annotations || null }}
+        attests: ${{ inputs.attests != '' && inputs.attests || null }}
+        build-args: ${{ inputs.build-args != '' && inputs.build-args || null }}
+        build-contexts: ${{ inputs.build-contexts != '' && inputs.build-contexts || null }}
+        builder: ${{ inputs.builder != '' && inputs.builder || null }}
+        cache-from: ${{ inputs.cache-from != '' && inputs.cache-from || null }}
+        cache-to: ${{ inputs.cache-to != '' && inputs.cache-to || null }}
+        call: ${{ inputs.call != '' && inputs.call || null }}
+        cgroup-parent: ${{ inputs.cgroup-parent != '' && inputs.cgroup-parent || null }}
+        context: ${{ inputs.context != '' && inputs.context || null }}
+        file: ${{ inputs.file != '' && inputs.file || null }}
+        labels: ${{ inputs.labels != '' && inputs.labels || null }}
+        load: ${{ inputs.load }}
+        network: ${{ inputs.network != '' && inputs.network || null }}
+        no-cache: ${{ inputs.no-cache }}
+        no-cache-filters: ${{ inputs.no-cache-filters != '' && inputs.no-cache-filters || null }}
+        outputs: ${{ inputs.outputs != '' && inputs.outputs || null }}
+        platforms: ${{ inputs.platforms != '' && inputs.platforms || null }}
+        provenance: ${{ inputs.provenance != '' && inputs.provenance || null }}
+        pull: ${{ inputs.pull }}
+        push: ${{ inputs.push }}
+        sbom: ${{ inputs.sbom != '' && inputs.sbom || null }}
+        secrets: ${{ inputs.secrets != '' && inputs.secrets || null }}
+        secret-envs: ${{ inputs.secret-envs != '' && inputs.secret-envs || null }}
+        secret-files: ${{ inputs.secret-files != '' && inputs.secret-files || null }}
+        shm-size: ${{ inputs.shm-size != '' && inputs.shm-size || null }}
+        ssh: ${{ inputs.ssh != '' && inputs.ssh || null }}
+        tags: ${{ inputs.tags != '' && inputs.tags || null }}
+        target: ${{ inputs.target != '' && inputs.target || null }}
+        ulimit: ${{ inputs.ulimit != '' && inputs.ulimit || null }}
+        github-token: ${{ inputs.github-token }}

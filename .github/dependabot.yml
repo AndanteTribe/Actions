@@ -30,6 +30,38 @@ updates:
     cooldown:
       default-days: 7
 
+  - package-ecosystem: github-actions
+    directory: /actions/docker-build-push-action
+    schedule:
+      interval: weekly
+      day: monday
+    cooldown:
+      default-days: 7
+
+  - package-ecosystem: github-actions
+    directory: /actions/docker-login-action
+    schedule:
+      interval: weekly
+      day: monday
+    cooldown:
+      default-days: 7
+
+  - package-ecosystem: github-actions
+    directory: /actions/docker-metadata-action
+    schedule:
+      interval: weekly
+      day: monday
+    cooldown:
+      default-days: 7
+
+  - package-ecosystem: github-actions
+    directory: /actions/docker-setup-buildx-action
+    schedule:
+      interval: weekly
+      day: monday
+    cooldown:
+      default-days: 7
+ 
   - package-ecosystem: docker
     directory: /actions/code-coverage-report-update
     schedule:
