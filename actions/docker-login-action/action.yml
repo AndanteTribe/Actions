@@ -1,0 +1,46 @@
+name: 'Docker Login Action'
+description: 'Wrapper for docker/login-action'
+author: 'AndanteTribe'
+inputs:
+  registry:
+    description: 'Server address of Docker registry. If not set then will default to Docker Hub'
+    required: false
+    default: ''
+  username:
+    description: 'Username used to log against the Docker registry'
+    required: false
+    default: ''
+  password:
+    description: 'Password or personal access token used to log against the Docker registry'
+    required: false
+    default: ''
+  ecr:
+    description: 'Specifies whether the given registry is ECR (auto, true or false)'
+    required: false
+    default: ''
+  scope:
+    description: 'Scope for the authentication token'
+    required: false
+    default: ''
+  logout:
+    description: 'Log out from the Docker registry at the end of a job'
+    required: false
+    default: 'true'
+  registry-auth:
+    description: 'Raw authentication to registries, defined as YAML objects'
+    required: false
+    default: ''
+runs:
+  using: 'composite'
+  steps:
+    # see: https://github.com/docker/login-action
+    - id: login
+      uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
+      with:
+        registry: ${{ inputs.registry != '' && inputs.registry || null }}
+        username: ${{ inputs.username != '' && inputs.username || null }}
+        password: ${{ inputs.password != '' && inputs.password || null }}
+        ecr: ${{ inputs.ecr != '' && inputs.ecr || null }}
+        scope: ${{ inputs.scope != '' && inputs.scope || null }}
+        logout: ${{ inputs.logout }}
+        registry-auth: ${{ inputs.registry-auth != '' && inputs.registry-auth || null }}

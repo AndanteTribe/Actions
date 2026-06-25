@@ -1,0 +1,97 @@
+name: 'Docker Metadata Action'
+description: 'Wrapper for docker/metadata-action'
+author: 'AndanteTribe'
+inputs:
+  context:
+    description: 'Where to get context data. Allowed options are "workflow"  (default), "git".'
+    required: false
+    default: 'workflow'
+  images:
+    description: 'List of Docker images to use as base name for tags'
+    required: false
+    default: ''
+  tags:
+    description: 'List of tags as key-value pair attributes'
+    required: false
+    default: ''
+  flavor:
+    description: 'Flavors to apply'
+    required: false
+    default: ''
+  labels:
+    description: 'List of custom labels'
+    required: false
+    default: ''
+  annotations:
+    description: 'List of custom annotations'
+    required: false
+    default: ''
+  sep-tags:
+    description: 'Separator to use for tags output (default \n)'
+    required: false
+    default: ''
+  sep-labels:
+    description: 'Separator to use for labels output (default \n)'
+    required: false
+    default: ''
+  sep-annotations:
+    description: 'Separator to use for annotations output (default \n)'
+    required: false
+    default: ''
+  bake-target:
+    description: 'Bake target name (default docker-metadata-action)'
+    required: false
+    default: ''
+  github-token:
+    description: 'GitHub Token as provided by secrets'
+    required: false
+    default: ${{ github.token }}
+outputs:
+  version:
+    description: 'Generated Docker image version'
+    value: ${{ steps.metadata.outputs.version }}
+  tags:
+    description: 'Generated Docker tags'
+    value: ${{ steps.metadata.outputs.tags }}
+  tag-names:
+    description: 'Generated Docker tag names without image base name'
+    value: ${{ steps.metadata.outputs.tag-names }}
+  labels:
+    description: 'Generated Docker labels'
+    value: ${{ steps.metadata.outputs.labels }}
+  annotations:
+    description: 'Generated annotations'
+    value: ${{ steps.metadata.outputs.annotations }}
+  json:
+    description: 'JSON output of tags and labels'
+    value: ${{ steps.metadata.outputs.json }}
+  bake-file-tags:
+    description: 'Bake definition file with tags'
+    value: ${{ steps.metadata.outputs.bake-file-tags }}
+  bake-file-labels:
+    description: 'Bake definition file with labels'
+    value: ${{ steps.metadata.outputs.bake-file-labels }}
+  bake-file-annotations:
+    description: 'Bake definition file with annotations'
+    value: ${{ steps.metadata.outputs.bake-file-annotations }}
+  bake-file:
+    description: 'Bake definition file with tags and labels'
+    value: ${{ steps.metadata.outputs.bake-file }}
+runs:
+  using: 'composite'
+  steps:
+    # see: https://github.com/docker/metadata-action
+    - id: metadata
+      uses: docker/metadata-action@80c7e94dd9b9319bd5eb7a0e0fe9291e23a2a2e9 # v6.1.0
+      with:
+        context: ${{ inputs.context }}
+        images: ${{ inputs.images != '' && inputs.images || null }}
+        tags: ${{ inputs.tags != '' && inputs.tags || null }}
+        flavor: ${{ inputs.flavor != '' && inputs.flavor || null }}
+        labels: ${{ inputs.labels != '' && inputs.labels || null }}
+        annotations: ${{ inputs.annotations != '' && inputs.annotations || null }}
+        sep-tags: ${{ inputs.sep-tags != '' && inputs.sep-tags || null }}
+        sep-labels: ${{ inputs.sep-labels != '' && inputs.sep-labels || null }}
+        sep-annotations: ${{ inputs.sep-annotations != '' && inputs.sep-annotations || null }}
+        bake-target: ${{ inputs.bake-target != '' && inputs.bake-target || null }}
+        github-token: ${{ inputs.github-token }}
