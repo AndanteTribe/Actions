@@ -57,6 +57,9 @@ inputs:
       Whether to checkout submodules: `true` to checkout submodules or `recursive` to
       recursively checkout submodules.
     default: 'false'
+  allow-unsafe-pr-checkout:
+    description: 'Whether to allow checkout of pull request refs that may be unsafe'
+    default: 'false'
   set-safe-directory:
     description: 'Add repository path as safe.directory for Git global config'
     default: 'true'
@@ -95,5 +98,6 @@ runs:
         show-progress: ${{ inputs.show-progress }}
         lfs: ${{ inputs.lfs }}
         submodules: ${{ inputs.submodules }}
+        allow-unsafe-pr-checkout: ${{ inputs.allow-unsafe-pr-checkout }}
         set-safe-directory: ${{ inputs.set-safe-directory }}
         github-server-url: ${{ inputs.github-server-url }}
