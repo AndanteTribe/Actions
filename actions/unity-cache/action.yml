@@ -44,7 +44,7 @@ runs:
       if: ${{ inputs.use-nugetforunity == 'true' && !contains(runner.labels, 'self-hosted') }}
       id: nuget-cache
       # see: https://github.com/actions/cache
-      uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: ${{ inputs.nuget-packages-path }}
         key: nuget-cache-${{ steps.info.outputs.name }}
@@ -64,7 +64,7 @@ runs:
       if: ${{ !contains(runner.labels, 'self-hosted') }}
       id: unity-cache
       # see: https://github.com/actions/cache
-      uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: ${{ inputs.unity-project-path }}/Library
         key: unity-cache-${{ steps.info.outputs.name }}
