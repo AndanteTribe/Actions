@@ -1,0 +1,7 @@
+rules:
+  dependabot-cooldown:
+    ignore:
+      # GitHub introduced a built-in 3-day cooldown for Dependabot version updates
+      # (July 2026). We intentionally rely on this platform default rather than
+      # declaring it explicitly in dependabot.yml.
+      - dependabot.yml
