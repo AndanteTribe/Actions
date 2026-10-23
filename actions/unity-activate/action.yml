@@ -1,0 +1,47 @@
+name: 'Unity Container Setup'
+description: 'Build and start a Unity editor Docker container with the specified project mounted.'
+author: 'AndanteTribe'
+inputs:
+  editor-image:
+    description: 'The Unity editor Docker image to use (e.g., unityci/editor:6000.3.2f1-linux-il2cpp-3.2.1).'
+    required: true
+  project-path:
+    description: 'Host path of the Unity project to mount into the container at /workspace.'
+    required: false
+    default: '${{ github.workspace }}'
+  container-name:
+    description: 'The name for the Unity Docker container.'
+    required: false
+    default: 'unity-agent'
+runs:
+  using: "composite"
+  steps:
+    - name: Build Unity container image
+      shell: bash
+      run: |
+        docker build \
+          --build-arg UNITY_EDITOR_IMAGE="${{ inputs.editor-image }}" \
+          -t unity-editor-image \
+          "${{ github.action_path }}"
+
+    - name: Start Unity container
+      shell: bash
+      env:
+        CONTAINER_NAME: ${{ inputs.container-name }}
+        PROJECT_PATH: ${{ inputs.project-path }}
+      run: |
+        docker run -d \
+          --name "$CONTAINER_NAME" \
+          -v "${PROJECT_PATH}:/workspace" \
+          unity-editor-image
+
+    - name: Verify Unity container started
+      shell: bash
+      env:
+        CONTAINER_NAME: ${{ inputs.container-name }}
+      run: |
+        if ! docker inspect --format='{{.State.Running}}' "$CONTAINER_NAME" 2>/dev/null | grep -q "true"; then
+          echo "::error::Unity container '$CONTAINER_NAME' failed to start."
+          docker logs "$CONTAINER_NAME" 2>&1 || true
+          exit 1
+        fi
