@@ -1,0 +1,6 @@
+# Remove this workaround once actionlint supports self-repository references.
+# https://github.com/rhysd/actionlint/pull/732
+paths:
+  .github/workflows/static-analysis.yml:
+    ignore:
+      - '^specifying action "\$/[^"@]+" in invalid format because ref is missing\.'
