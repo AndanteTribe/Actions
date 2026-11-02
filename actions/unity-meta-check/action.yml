@@ -70,7 +70,7 @@ runs:
   using: 'composite'
   steps:
     # see: https://github.com/DeNA/unity-meta-check
-    - uses: DeNA/unity-meta-check@a2e35e2c0b652031facd143db6f0a438b49de38a # v4.0.0
+    - uses: DeNA/unity-meta-check@8c358bbb96805eec6f0610b510677111fa97deb4 # v4.0.1
       with:
         log_level: ${{ inputs.log_level }}
         target_path: ${{ inputs.target_path }}
