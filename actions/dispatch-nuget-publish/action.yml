@@ -1,0 +1,39 @@
+name: 'Dispatch NuGet Publish'
+description: 'Start a centralized NuGet publishing run in AndanteTribe/Actions'
+author: 'AndanteTribe'
+inputs:
+  token:
+    description: 'Fine-grained PAT with Actions: write on AndanteTribe/Actions'
+    required: true
+  repository:
+    description: 'Source repository (owner/name)'
+    default: ${{ github.repository }}
+  sha:
+    description: 'Full source commit SHA'
+    default: ${{ github.sha }}
+  project:
+    description: 'Project or solution path relative to the source repository'
+    default: '.'
+  dotnet-version:
+    description: '.NET SDK version'
+    default: '10.0.x'
+runs:
+  using: 'composite'
+  steps:
+    - name: Dispatch publishing workflow
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+        GH_HOST: github.com
+        TARGET_REPOSITORY: ${{ inputs.repository }}
+        TARGET_SHA: ${{ inputs.sha }}
+        PROJECT: ${{ inputs.project }}
+        DOTNET_VERSION: ${{ inputs.dotnet-version }}
+      run: |
+        gh workflow run nuget-publish.yml \
+          --repo AndanteTribe/Actions \
+          --ref main \
+          -f repository="$TARGET_REPOSITORY" \
+          -f sha="$TARGET_SHA" \
+          -f project="$PROJECT" \
+          -f dotnet-version="$DOTNET_VERSION"
