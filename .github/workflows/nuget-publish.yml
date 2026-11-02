@@ -1,0 +1,72 @@
+name: Publish NuGet
+run-name: Publish NuGet - ${{ inputs.repository }} (${{ inputs.sha }})
+
+on:
+  workflow_dispatch:
+    inputs:
+      repository:
+        description: 'Source repository (owner/name)'
+        required: true
+        type: string
+      sha:
+        description: 'Full source commit SHA'
+        required: true
+        type: string
+      project:
+        description: 'Project or solution path relative to the source repository'
+        required: false
+        default: '.'
+        type: string
+      dotnet-version:
+        description: '.NET SDK version'
+        required: false
+        default: '10.0.x'
+        type: string
+
+permissions: {}
+
+concurrency:
+  group: nuget-publish-${{ inputs.repository }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.repository == 'AndanteTribe/Actions' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout source
+        # ghasec-ignore: unpinned-action
+        uses: AndanteTribe/Actions/actions/checkout@main # zizmor: ignore[unpinned-uses] repository-local action reference is intentionally tracked on @main
+        with:
+          repository: ${{ inputs.repository }}
+          ref: ${{ inputs.sha }}
+          path: source
+      - name: Setup .NET
+        # ghasec-ignore: unpinned-action
+        uses: AndanteTribe/Actions/actions/setup-dotnet@main # zizmor: ignore[unpinned-uses] repository-local action reference is intentionally tracked on @main
+        with:
+          dotnet-version: ${{ inputs.dotnet-version }}
+      - name: Pack
+        working-directory: source
+        shell: bash
+        env:
+          PROJECT: ${{ inputs.project }}
+        run: dotnet pack "./$PROJECT" --configuration Release --output "$GITHUB_WORKSPACE/packages"
+      - name: NuGet login
+        id: login
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
+        with:
+          user: ${{ vars.NUGET_USER }}
+      - name: Publish to NuGet
+        shell: bash
+        env:
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
+        run: |
+          dotnet nuget push 'packages/*.nupkg' \
+            --api-key "$NUGET_API_KEY" \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate
