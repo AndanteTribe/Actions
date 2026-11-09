@@ -1,5 +1,10 @@
 version: 2
 updates:
+  - package-ecosystem: docker
+    directory: /actions/sign-upm-release
+    schedule:
+      interval: weekly
+      day: monday
   # Maintain dependencies for GitHub Actions used in workflows
   - package-ecosystem: github-actions
     directory: /
