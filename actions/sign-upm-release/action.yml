@@ -1,0 +1,41 @@
+name: 'Sign UPM package and upload to release'
+description: 'Pack and sign using Unity UPM CLI, then upload to an existing GitHub Release.'
+author: 'AndanteTribe'
+inputs:
+  package-path:
+    description: 'Package directory containing package.json, relative to workspace.'
+    required: true
+  tag:
+    description: 'Existing release tag matching the package version (optional v prefix).'
+    required: true
+  organization-id:
+    description: 'Unity organization ID.'
+    required: true
+  service-account-key-id:
+    description: 'Unity service account key ID.'
+    required: true
+  service-account-key-secret:
+    description: 'Unity service account key secret.'
+    required: true
+  token:
+    description: 'GitHub token with contents: write.'
+    default: ${{ github.token }}
+  repository:
+    description: 'Repository containing the release (owner/name).'
+    default: ${{ github.repository }}
+outputs:
+  archive-path:
+    description: 'Workspace-relative path to the signed archive, usable by subsequent host steps.'
+runs:
+  using: docker
+  image: Dockerfile
+  env:
+    PACKAGE_PATH: ${{ inputs.package-path }}
+    RELEASE_TAG: ${{ inputs.tag }}
+    GH_REPO: ${{ inputs.repository }}
+    GH_TOKEN: ${{ inputs.token }}
+    UPM_ORG_ID: ${{ inputs.organization-id }}
+    UPM_SERVICE_ACCOUNT_KEY_ID: ${{ inputs.service-account-key-id }}
+    UPM_SERVICE_ACCOUNT_KEY_SECRET: ${{ inputs.service-account-key-secret }}
+  args:
+    - /app/SignUpmRelease.cs
