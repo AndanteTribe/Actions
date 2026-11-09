@@ -108,7 +108,7 @@ static async Task<string> PackAndSign(string package, string organization)
 
 static string FindArchive(string dist) =>
     Directory.EnumerateFiles(dist)
-        .SingleOrDefault(static path => path.EndsWith(".tgz", StringComparison.Ordinal) || path.EndsWith(".tar.gz", StringComparison.Ordinal)) 
+        .SingleOrDefault(static path => path.EndsWith(".tgz", StringComparison.Ordinal) || path.EndsWith(".tar.gz", StringComparison.Ordinal))
     ?? throw new InvalidOperationException("Signed archive was not generated.");
 
 static async Task ValidateArchive(string archive, UnityPackageManifest expected)
