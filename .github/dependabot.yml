@@ -1,13 +1,10 @@
 version: 2
 updates:
-  - package-ecosystem: docker
-    directory: /actions/sign-upm-release
-    schedule:
-      interval: weekly
-      day: monday
-  # Maintain dependencies for GitHub Actions used in workflows
+  # Maintain workflow and wrapper action dependencies, including new wrappers
   - package-ecosystem: github-actions
-    directory: /
+    directories:
+      - /
+      - /actions/*
     schedule:
       interval: weekly
       day: monday
@@ -16,67 +13,24 @@ updates:
         patterns:
           - '*'
 
-  # Maintain pinned versions in wrapper actions (Docker image digests + action SHAs)
+  # Maintain pinned Docker image versions in wrapper actions
   - package-ecosystem: docker
-    directory: /actions/build-unitypackage
+    directories:
+      - /actions/build-unitypackage
+      - /actions/code-coverage-report-update
+      - /actions/fetch-unity-info
+      - /actions/get-unity-serial
+      - /actions/set-outputs
+      - /actions/sign-upm-release
     schedule:
       interval: weekly
       day: monday
+    groups:
+      docker:
+        patterns:
+          - '*'
 
-  - package-ecosystem: github-actions
-    directory: /actions/checkout
-    schedule:
-      interval: weekly
-      day: monday
-
-  - package-ecosystem: github-actions
-    directory: /actions/docker-build-push-action
-    schedule:
-      interval: weekly
-      day: monday
-
-  - package-ecosystem: github-actions
-    directory: /actions/docker-login-action
-    schedule:
-      interval: weekly
-      day: monday
-
-  - package-ecosystem: github-actions
-    directory: /actions/docker-metadata-action
-    schedule:
-      interval: weekly
-      day: monday
-
-  - package-ecosystem: github-actions
-    directory: /actions/docker-setup-buildx-action
-    schedule:
-      interval: weekly
-      day: monday
-
-  - package-ecosystem: docker
-    directory: /actions/code-coverage-report-update
-    schedule:
-      interval: weekly
-      day: monday
-
-  - package-ecosystem: github-actions
-    directory: /actions/create-github-app-token
-    schedule:
-      interval: weekly
-      day: monday
-
-  - package-ecosystem: docker
-    directory: /actions/fetch-unity-info
-    schedule:
-      interval: weekly
-      day: monday
-
-  - package-ecosystem: docker
-    directory: /actions/get-unity-serial
-    schedule:
-      interval: weekly
-      day: monday
-
+  # Keep the SDK version restriction specific to NuGetForUnity
   - package-ecosystem: docker
     directory: /actions/nugetforunity-restore
     schedule:
@@ -86,45 +40,3 @@ updates:
       - dependency-name: "dotnet/sdk"
         versions:
           - ">= 10.0.0"
-
-  - package-ecosystem: docker
-    directory: /actions/set-outputs
-    schedule:
-      interval: weekly
-      day: monday
-
-  - package-ecosystem: github-actions
-    directory: /actions/setup-dotnet
-    schedule:
-      interval: weekly
-      day: monday
-
-  - package-ecosystem: github-actions
-    directory: /actions/unity-cache
-    schedule:
-      interval: weekly
-      day: monday
-
-  - package-ecosystem: github-actions
-    directory: /actions/unity-meta-check
-    schedule:
-      interval: weekly
-      day: monday
-
-  - package-ecosystem: github-actions
-    directory: /actions/unity-test-runner
-    schedule:
-      interval: weekly
-      day: monday
-
-  - package-ecosystem: github-actions
-    directory: /actions/upload-artifact
-    schedule:
-      interval: weekly
-      day: monday
-
-  - package-ecosystem: github-actions
-    directory: /actions/static-analysis
-    schedule:
-      interval: weekly
-      day: monday

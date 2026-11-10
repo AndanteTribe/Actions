@@ -1,0 +1,48 @@
+name: 'OpenUPM Publish Wait'
+description: 'Trigger an OpenUPM package refresh and wait for a tag to publish. Requires id-token: write.'
+author: 'AndanteTribe'
+inputs:
+  package:
+    description: 'OpenUPM package name'
+    required: true
+  tag:
+    description: 'Git tag that triggered the workflow'
+    required: true
+  timeout-minutes:
+    description: 'Maximum number of minutes to wait'
+    required: false
+    default: '15'
+  poll-interval-seconds:
+    description: 'Seconds between status checks'
+    required: false
+    default: '15'
+outputs:
+  state:
+    description: 'Final observed release state'
+    value: ${{ steps.openupm.outputs.state }}
+  reason:
+    description: 'OpenUPM release reason when available'
+    value: ${{ steps.openupm.outputs.reason }}
+  published-version:
+    description: 'Version published to the registry when available'
+    value: ${{ steps.openupm.outputs.published-version }}
+  signed:
+    description: 'Whether OpenUPM reports the package as signed'
+    value: ${{ steps.openupm.outputs.signed }}
+  package-url:
+    description: 'OpenUPM package page URL'
+    value: ${{ steps.openupm.outputs.package-url }}
+  status-url:
+    description: 'OpenUPM release status API URL'
+    value: ${{ steps.openupm.outputs.status-url }}
+runs:
+  using: 'composite'
+  steps:
+    # see: https://github.com/openupm/openupm-action
+    - id: openupm
+      uses: openupm/openupm-action@89b79dc8dd6cb319efff06727f8fa0051ce7e517 # v1.0.1
+      with:
+        package: ${{ inputs.package }}
+        tag: ${{ inputs.tag }}
+        timeout-minutes: ${{ inputs.timeout-minutes }}
+        poll-interval-seconds: ${{ inputs.poll-interval-seconds }}
