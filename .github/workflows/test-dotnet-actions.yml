@@ -26,18 +26,18 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6.0.2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
       - name: Create test project directory
         run: mkdir -p "src/Test.Unity" "src/Project With Spaces"
 
-      # Use this checkout's Dockerfile and action metadata, including PR updates.
+      # Use this workflow revision's action, including PR updates.
       - name: Fetch project info
         id: info
         timeout-minutes: 2
-        uses: ./actions/fetch-unity-info
+        uses: $/actions/fetch-unity-info
         with:
           unity-project-path: src/Test.Unity
 
@@ -53,7 +53,7 @@ jobs:
       - name: Fetch project info with spaces
         id: spaces
         timeout-minutes: 2
-        uses: ./actions/fetch-unity-info
+        uses: $/actions/fetch-unity-info
         with:
           unity-project-path: src/Project With Spaces
 
@@ -73,7 +73,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6.0.2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Create test asset
@@ -84,7 +84,7 @@ jobs:
       - name: Build package
         id: package
         timeout-minutes: 2
-        uses: ./actions/build-unitypackage
+        uses: $/actions/build-unitypackage
         with:
           package-path: .smoke-tests/Assets/example.txt
           root-path: .smoke-tests
@@ -107,7 +107,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6.0.2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Create synthetic license
@@ -118,7 +118,7 @@ jobs:
       - name: Extract serial
         id: serial
         timeout-minutes: 2
-        uses: ./actions/get-unity-serial
+        uses: $/actions/get-unity-serial
         with:
           unity-license: ${{ steps.fixture.outputs.license }}
       - name: Verify serial
@@ -141,13 +141,13 @@ jobs:
           - unity: 'false'
             nuget: 'true'
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6.0.2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Set outputs
         id: outputs
         timeout-minutes: 2
-        uses: ./actions/set-outputs
+        uses: $/actions/set-outputs
         with:
           unity-cache-hit: ${{ matrix.unity }}
           nuget-cache-hit: ${{ matrix.nuget }}

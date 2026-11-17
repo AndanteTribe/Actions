@@ -4,3 +4,6 @@ paths:
   .github/workflows/static-analysis.yml:
     ignore:
       - '^specifying action "\$/[^"@]+" in invalid format because ref is missing\.'
+  .github/workflows/test-dotnet-actions.yml:
+    ignore:
+      - '^specifying action "\$/[^"@]+" in invalid format because ref is missing\.'
