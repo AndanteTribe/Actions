@@ -1,0 +1,162 @@
+name: Test .NET Actions
+
+# sign-upm-release と code-coverage-report-update は、署名・公開やサマリー出力の
+# 個別の検証環境が必要になるため、このスモークテストでは意図的に対象外とする。
+on:
+  pull_request:
+    paths:
+      - actions/fetch-unity-info/**
+      - actions/build-unitypackage/**
+      - actions/get-unity-serial/**
+      - actions/set-outputs/**
+      - .github/workflows/test-dotnet-actions.yml
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  fetch-unity-info:
+    name: Run Fetch Unity Info
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Create test project directory
+        run: mkdir -p "src/Test.Unity" "src/Project With Spaces"
+
+      # Use this checkout's Dockerfile and action metadata, including PR updates.
+      - name: Fetch project info
+        id: info
+        timeout-minutes: 2
+        uses: ./actions/fetch-unity-info
+        with:
+          unity-project-path: src/Test.Unity
+
+      - name: Verify project name
+        env:
+          ACTUAL_NAME: ${{ steps.info.outputs.name }}
+        run: |
+          if [ "$ACTUAL_NAME" != "Test.Unity" ]; then
+            echo "::error::Expected project name Test.Unity; got '$ACTUAL_NAME'"
+            exit 1
+          fi
+
+      - name: Fetch project info with spaces
+        id: spaces
+        timeout-minutes: 2
+        uses: ./actions/fetch-unity-info
+        with:
+          unity-project-path: src/Project With Spaces
+
+      - name: Verify project name with spaces
+        env:
+          ACTUAL_NAME: ${{ steps.spaces.outputs.name }}
+        run: |
+          if [ "$ACTUAL_NAME" != "Project With Spaces" ]; then
+            echo "::error::Expected project name Project With Spaces; got '$ACTUAL_NAME'"
+            exit 1
+          fi
+
+  build-unitypackage:
+    name: Run Build Unitypackage
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6.0.2
+        with:
+          persist-credentials: false
+      - name: Create test asset
+        run: |
+          mkdir -p .smoke-tests/Assets
+          printf 'test asset\n' > .smoke-tests/Assets/example.txt
+          printf 'fileFormatVersion: 2\nguid: 0123456789abcdef0123456789abcdef\n' > .smoke-tests/Assets/example.txt.meta
+      - name: Build package
+        id: package
+        timeout-minutes: 2
+        uses: ./actions/build-unitypackage
+        with:
+          package-path: .smoke-tests/Assets/example.txt
+          root-path: .smoke-tests
+          output-path: .smoke-tests/output.unitypackage
+      - name: Verify archive contents and output
+        env:
+          PACKAGE_PATH: ${{ steps.package.outputs.package-path }}
+        run: |
+          test "$PACKAGE_PATH" = /github/workspace/.smoke-tests/output.unitypackage
+          archive=.smoke-tests/output.unitypackage
+          guid=0123456789abcdef0123456789abcdef
+          tar -xOf "$archive" "$guid/asset" | cmp - .smoke-tests/Assets/example.txt
+          tar -xOf "$archive" "$guid/asset.meta" | cmp - .smoke-tests/Assets/example.txt.meta
+          test "$(tar -xOf "$archive" "$guid/pathname")" = Assets/example.txt
+
+  get-unity-serial:
+    name: Run Get Unity Serial
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6.0.2
+        with:
+          persist-credentials: false
+      - name: Create synthetic license
+        id: fixture
+        run: |
+          encoded="$(printf '0000TEST-SERIAL-NOT-A-REAL-LICENSE' | base64 -w0)"
+          printf 'license=<DeveloperData Value="%s"/>\n' "$encoded" >> "$GITHUB_OUTPUT"
+      - name: Extract serial
+        id: serial
+        timeout-minutes: 2
+        uses: ./actions/get-unity-serial
+        with:
+          unity-license: ${{ steps.fixture.outputs.license }}
+      - name: Verify serial
+        env:
+          ACTUAL_SERIAL: ${{ steps.serial.outputs.serial }}
+        run: test "$ACTUAL_SERIAL" = TEST-SERIAL-NOT-A-REAL-LICENSE
+
+  set-outputs:
+    name: Run Set Outputs / unity=${{ matrix.unity }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - unity: 'true'
+            nuget: 'false'
+          - unity: 'false'
+            nuget: 'true'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6.0.2
+        with:
+          persist-credentials: false
+      - name: Set outputs
+        id: outputs
+        timeout-minutes: 2
+        uses: ./actions/set-outputs
+        with:
+          unity-cache-hit: ${{ matrix.unity }}
+          nuget-cache-hit: ${{ matrix.nuget }}
+      - name: Verify both outputs
+        env:
+          EXPECTED_UNITY: ${{ matrix.unity }}
+          EXPECTED_NUGET: ${{ matrix.nuget }}
+          ACTUAL_UNITY: ${{ steps.outputs.outputs.cache-hit-unity }}
+          ACTUAL_NUGET: ${{ steps.outputs.outputs.cache-hit-nuget }}
+        run: |
+          test "$ACTUAL_UNITY" = "$EXPECTED_UNITY"
+          test "$ACTUAL_NUGET" = "$EXPECTED_NUGET"
